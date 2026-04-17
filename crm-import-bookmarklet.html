@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CRM Import Bookmarklet</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; background: #f5f5f5; }
+  h1 { color: #2d4a6b; }
+  h2 { color: #5a8a1f; margin-top: 30px; }
+  .bookmarklet-box { background: #fff; border: 2px solid #5a8a1f; border-radius: 8px; padding: 20px; margin: 20px 0; }
+  .bookmarklet-link { display: inline-block; background: #5a8a1f; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-size: 16px; font-weight: bold; cursor: grab; }
+  .bookmarklet-link:hover { background: #4a7a0f; }
+  .steps { background: #fff; border-radius: 8px; padding: 20px; margin: 20px 0; border: 1px solid #ddd; }
+  .steps ol { line-height: 2; }
+  .note { background: #fff8e1; border-left: 4px solid #f9a825; padding: 12px 16px; margin: 16px 0; border-radius: 0 6px 6px 0; }
+  code { background: #eee; padding: 2px 6px; border-radius: 3px; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<h1>&#127970; CRM Customer Importer</h1>
+<p>This bookmarklet runs on <strong>windowbase.info</strong> while you're logged in, lets you select OK customers, and imports them directly into your CRM's Supabase database.</p>
+
+<div class="steps">
+  <h2>How to install</h2>
+  <ol>
+    <li>Make sure your browser bookmarks bar is visible (<code>Ctrl+Shift+B</code>)</li>
+    <li>Drag the green button below onto your bookmarks bar</li>
+    <li>It will appear as <strong>"Import to CRM"</strong></li>
+  </ol>
+</div>
+
+<div class="bookmarklet-box">
+  <h2>Your Bookmarklet</h2>
+  <p>Drag this to your bookmarks bar:</p>
+  <a class="bookmarklet-link" href="javascript:(function(){var s=document.createElement('script');s.src='https://crm.prospectmanager.co.uk/crm-importer.js?v='+Date.now();document.head.appendChild(s);})();">Import to CRM</a>
+
+  <p style="margin-top:16px; font-size:13px; color:#666;">&uarr; Drag the green button above to your bookmarks bar</p>
+</div>
+
+<div class="steps">
+  <h2>How to use</h2>
+  <ol>
+    <li>Log in to <strong>windowbase.info</strong></li>
+    <li>Go to <strong>Customers</strong> list page</li>
+    <li>Change the <strong>"Show"</strong> dropdown to <strong>200</strong> so all customers are visible on one page</li>
+    <li>Click <strong>"Import to CRM"</strong> in your bookmarks bar</li>
+    <li>A panel will appear on the right showing all <strong>OK</strong> customers</li>
+    <li>Tick the ones you want to import (or Select All)</li>
+    <li>Click <strong>Import Selected</strong></li>
+    <li>Wait while it fetches each customer's details and users, then imports to Supabase</li>
+  </ol>
+
+  <div class="note">
+    <strong>Note:</strong> Make sure to set <strong>Show</strong> to <strong>200</strong> before running the bookmarklet so all customers are visible. The importer reads the current page, then fetches address details and user information from each customer's detail page. Allow a few seconds per customer.
+  </div>
+
+  <div class="note">
+    <strong>Column mapping:</strong> Company name &rarr; <code>crm_customers</code>, address fields &rarr; address columns, internal notes &rarr; notes. Each user &rarr; <code>crm_contacts</code> (split into first/last name) with last login stored in notes.
+  </div>
+</div>
+
+</body>
+</html>

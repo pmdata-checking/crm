@@ -1,0 +1,47 @@
+# Environment / secrets
+.env
+.env.local
+.env.*.local
+*.env
+secrets.json
+credentials.json
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+
+# Node (in case you ever add build tooling)
+node_modules/
+dist/
+build/
+
+# Netlify local
+.netlify/
+
+# Python (if you add scripts)
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Archive/backup files
+*.bak
+*.backup
+*.dump
+*.sql.backup
+
+# OneDrive sync artifacts
+~$*
+.tmp.drivedownload/

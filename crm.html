@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PROSPECTManager™ CRM</title>
+<link rel="icon" type="image/jpeg" href="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCABAAEADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDwaiiiu88EKKKKACiiigAooooAKsabAtzqNpBJkJLMkbY64LAH+dV6u6H/AMhrT/8Ar5i/9DFZ1W1Btdioq8kep674N8B6HrMOl6lqGrw3MwDIcgoAzFQSwXjkVi3vgWy0fx9a6JqMtxNp95GZY7lJBG8SAMWLcEHG054cc16vxLvfCFh4tt5/EVlqF1qEcKvGISPKKh22gjIyc5rh9a8UyeJtR13WvJNvBa6a1pbIWyymVwmSfUhnP4V8TltbHV6UanNPllHVytbmbSi4W1336Hq1o0oyasrp9O3W5zvj7QovDvim7065aR7dAjxNIQWKsoPJAHfNbHhPwjZXXhbVdf12S4S2tot8EMDhXl5IySQcAsNo+h9K2PHNhHrt54c1m4dotCm0InvJhwFWM4IP+0SwUD1IqPVNQb/hU11duiwnV9RWKKJekcEIwqD2G3HvknvXpfXq9bCUKcZWm3GMn1unaS9WlJvsvVGHsYRqSk1pq1/XzR5pKVMjGNSiE8KW3YHpnvTaKK+nWhwBUtnOba7gnVQxikWQA98EHH6VFVvSLqGy1S1ubq0jvIIpA724hwsgH8JqanwPS/l3HHdGv458US+LdYTUJ7WO2ZIhFsjYsCASc5P+9UFtrFrB4eutMGm7nuWSR7j7QwbcmduBjGPmPH61Yute0yWy1SGPw9Zxy3d2txDKHObdARmNeOhwfT7x9qsXXibSZrzV5o/C9jFHeWqwQRhzi2cDBkXjqevboPfPlwp8lKNGNBqMbWXMulrfa83v/L5o6HK8nJzV35f8D+rlO98UXl54Z0vQpVAsrJix2sQ0uWJAY9sZIH1zVnX/FUOq+HNP0iPSktYbDPkOlwzHn7xYEfMT+FSW3ifSYr7S55PC9hJHaWht5oi5xcOR/rG46/n1PPTFe01/TYbLSYZPD1nLJZ3TTzysxzcoScRtx0GR6/dHHXMqik4yWHaabkveW75rv4tfn/NbZMfPuufdW29PL+rHN0Va1a5hvdTurm2tY7OGWRnS3jOVjBP3RVWvXi24ptWZytWegUUUVQgooooAKKKKACiiigD/9k=">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Source+Sans+3:wght@400;500;600&family=Libre+Baskerville:ital@1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#1a3a5c;--navy2:#1e4570;--green:#7ab317;--green2:#8fcc1a;--greendark:#5d8a0e;
+  --teal:#1a8a8a;--white:#ffffff;--off:#f4f7fa;--border:#dde4ec;--text:#1a2e40;--muted:#6b7f96;
+  --done:#1a9e5e;--done-bg:#e6f7ef;--cb:#e05c00;--cb-bg:#fff0e6;--danger:#c0392b;
+  --amber:#d97706;--amber-bg:#fef3c7;
+  --locked:#7c3aed;--hover:#eef6ff;--font:'Montserrat',sans-serif;--body:'Source Sans 3',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--body);background:var(--off);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+#loading{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:999;flex-direction:column;gap:18px;}
+.ld-logo{font-family:var(--font);font-size:30px;font-weight:800;color:#fff;}
+.ld-logo em{font-weight:400;font-style:italic;color:var(--green2);}
+.ld-spin{width:36px;height:36px;border:3px solid rgba(255,255,255,.15);border-top-color:var(--green2);border-radius:50%;animation:spin .8s linear infinite;}
+.ld-text{font-size:11px;font-weight:600;color:rgba(255,255,255,.4);letter-spacing:.12em;text-transform:uppercase;font-family:var(--font);}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+#loginWrap{display:none;align-items:center;justify-content:center;flex:1;background:linear-gradient(135deg,var(--navy) 0%,#0d2236 100%);}
+.lcard{background:#fff;border-radius:10px;padding:48px 52px;width:420px;box-shadow:0 24px 64px rgba(0,0,0,.32);text-align:center;}
+.lcard-logo{font-family:var(--font);font-size:28px;font-weight:800;color:var(--navy);}
+.lcard-logo em{font-family:'Libre Baskerville',Georgia,serif;font-weight:400;font-style:italic;color:var(--greendark);}
+.lcard-badge{display:inline-block;background:var(--teal);color:#fff;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:2px 10px;border-radius:20px;margin:8px 0 22px;}
+.lf-group{margin-bottom:16px;text-align:left;}
+.lf-label{display:block;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;font-family:var(--font);}
+.lf-input{width:100%;border:1.5px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--body);font-size:14px;padding:11px 14px;transition:border-color .2s;}
+.lf-input:focus{outline:none;border-color:var(--green);}
+.login-btn{width:100%;background:var(--green);border:none;border-radius:6px;color:#fff;cursor:pointer;font-family:var(--font);font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:13px;transition:background .2s;margin-top:6px;}
+.login-btn:hover{background:var(--green2);}
+.login-btn:disabled{opacity:.5;cursor:not-allowed;}
+.login-err{color:var(--danger);font-size:12px;margin-top:10px;font-weight:600;display:none;}
+
+header{background:var(--navy);height:54px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 2px 12px rgba(0,0,0,.25);}
+.h-logo{font-family:var(--font);font-size:18px;font-weight:800;color:#fff;display:flex;align-items:center;gap:10px;}
+.h-logo em{font-family:'Libre Baskerville',Georgia,serif;font-style:italic;font-weight:400;color:var(--green2);}
+.h-logo sup{font-size:9px;font-style:normal;vertical-align:super;}
+.h-badge{background:var(--teal);color:#fff;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:2px 10px;border-radius:20px;}
+.h-right{display:flex;gap:8px;align-items:center;}
+.h-user{font-size:11px;font-weight:600;color:rgba(255,255,255,.5);margin-right:4px;font-family:var(--font);}
+.hbtn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:5px;color:rgba(255,255,255,.75);cursor:pointer;font-family:var(--font);font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:6px 12px;transition:all .15s;}
+.hbtn:hover{background:rgba(255,255,255,.16);color:#fff;}
+.hbtn.danger{border-color:rgba(192,57,43,.4);color:rgba(255,130,110,.85);}
+.hbtn.danger:hover{background:rgba(192,57,43,.18);color:#ff8070;}
+
+#app{display:none;flex-direction:column;flex:1;overflow:hidden;}
+.main{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.screen{display:none;flex:1;overflow:hidden;flex-direction:column;}
+.screen.active{display:flex;}
+
+.toolbar{background:var(--green);padding:0 18px;height:44px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.tb-title{font-family:var(--font);font-size:13px;font-weight:700;color:#fff;letter-spacing:.04em;flex:1;}
+.tb-btn{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:4px;color:#fff;cursor:pointer;font-family:var(--font);font-size:11px;font-weight:700;padding:5px 12px;letter-spacing:.06em;text-transform:uppercase;transition:all .15s;}
+.tb-btn:hover{background:rgba(255,255,255,.28);}
+.tb-sep{width:1px;background:rgba(255,255,255,.25);height:24px;margin:0 2px;}
+.tb-search{background:rgba(255,255,255,.92);border:none;border-radius:4px;font-family:var(--body);font-size:13px;padding:5px 10px;width:190px;color:var(--text);}
+.tb-search:focus{outline:none;background:#fff;}
+
+.list-scroll{flex:1;overflow-y:auto;padding:22px 24px;}
+.list-scroll::-webkit-scrollbar{width:5px;}
+.list-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px;}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:14px 16px;border-left:4px solid var(--border);box-shadow:0 1px 4px rgba(26,46,74,.05);}
+.stat-card.active{border-left-color:var(--done);}
+.stat-card.trial{border-left-color:var(--amber);}
+.stat-card.contra{border-left-color:var(--teal);}
+.stat-card.lapsed{border-left-color:var(--danger);}
+.stat-card.prospect{border-left-color:var(--navy);}
+.stat-val{font-family:var(--font);font-size:26px;font-weight:800;color:var(--navy);}
+.stat-lbl{font-family:var(--font);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:3px;}
+
+.tbl-wrap{background:var(--white);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:0 1px 6px rgba(26,46,74,.05);}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:var(--navy);}
+thead th{font-family:var(--font);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.85);text-align:left;padding:11px 14px;white-space:nowrap;border-right:1px solid rgba(255,255,255,.08);}
+thead th:last-child{border-right:none;}
+tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:var(--hover);}
+tbody td{padding:10px 14px;font-size:13px;}
+.td-co{font-family:var(--font);font-weight:700;color:var(--navy);}
+
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-family:var(--font);font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;}
+.badge-active{background:var(--done-bg);color:var(--done);}
+.badge-trial{background:var(--amber-bg);color:var(--amber);}
+.badge-contra{background:#e0f5f5;color:var(--teal);}
+.badge-lapsed{background:#fce8e6;color:var(--danger);}
+.badge-prospect{background:#e8ecf5;color:var(--navy);}
+
+.profile-scroll{flex:1;overflow-y:auto;padding:22px 24px;}
+.profile-grid{display:grid;grid-template-columns:320px 1fr;gap:16px;align-items:start;}
+.profile-left,.profile-right{display:flex;flex-direction:column;gap:16px;}
+.card{background:var(--white);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(26,46,74,.05);}
+.card-hdr{background:var(--navy);padding:11px 16px;display:flex;align-items:center;gap:8px;}
+.card-hdr h3{font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;flex:1;}
+.card-body{padding:14px 16px;}
+.info-row{margin-bottom:10px;}
+.info-row:last-child{margin-bottom:0;}
+.info-lbl{font-family:var(--font);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+.info-val{font-size:13px;color:var(--text);}
+.info-val a{color:var(--teal);text-decoration:none;}
+.info-val a:hover{text-decoration:underline;}
+
+.contact-card{border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:8px;}
+.contact-card:last-child{margin-bottom:0;}
+.contact-name{font-family:var(--font);font-weight:700;font-size:13px;color:var(--navy);}
+.contact-job{font-size:11px;color:var(--muted);margin-bottom:6px;}
+.contact-detail{font-size:12px;margin-top:2px;}
+
+.comm-item{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);}
+.comm-item:last-child{border-bottom:none;}
+.comm-icon{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;}
+.comm-icon.call{background:var(--done-bg);}
+.comm-icon.email{background:#dbeafe;}
+.comm-icon.meeting{background:var(--amber-bg);}
+.comm-icon.note{background:#f3e8ff;}
+.comm-icon.task{background:#fce8e6;}
+.comm-meta{font-size:11px;color:var(--muted);margin-top:3px;}
+.comm-subj{font-family:var(--font);font-weight:700;font-size:12px;color:var(--navy);}
+.comm-txt{font-size:12px;color:var(--text);margin-top:3px;white-space:pre-wrap;}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(10,20,40,.55);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
+.modal-overlay.open{display:flex;}
+.modal{background:#fff;border-radius:10px;width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.22);}
+.modal-hdr{background:var(--navy);padding:16px 20px;border-radius:10px 10px 0 0;display:flex;align-items:center;}
+.modal-hdr h2{font-family:var(--font);font-size:13px;font-weight:800;color:#fff;flex:1;letter-spacing:.06em;text-transform:uppercase;}
+.modal-xbtn{background:none;border:none;color:rgba(255,255,255,.6);font-size:20px;cursor:pointer;line-height:1;}
+.modal-xbtn:hover{color:#fff;}
+.modal-body{padding:20px;}
+.modal-ftr{padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
+.mlabel{font-family:var(--font);font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.minput{width:100%;border:1.5px solid var(--border);border-radius:5px;font-family:var(--body);font-size:14px;padding:9px 12px;color:var(--text);}
+.minput:focus{outline:none;border-color:var(--green);}
+.mfield{margin-bottom:14px;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.sec-lbl{font-family:var(--font);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--navy);border-bottom:1px solid var(--border);padding-bottom:6px;margin:16px 0 12px;}
+.mbtn{border:none;border-radius:6px;cursor:pointer;font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:10px 18px;transition:all .15s;}
+.mbtn-primary{background:var(--green);color:#fff;}
+.mbtn-primary:hover{background:var(--green2);}
+.mbtn-cancel{background:var(--off);border:1.5px solid var(--border);color:var(--muted);}
+.mbtn-cancel:hover{border-color:var(--navy);color:var(--navy);}
+.mbtn-teal{background:var(--teal);color:#fff;}
+.mbtn-teal:hover{opacity:.88;}
+
+.toast{position:fixed;bottom:20px;right:22px;background:var(--navy);border-left:4px solid var(--green);border-radius:5px;padding:11px 18px;font-family:var(--font);font-size:11px;font-weight:600;letter-spacing:.04em;color:#fff;z-index:500;transform:translateY(20px);opacity:0;transition:all .22s;box-shadow:0 8px 24px rgba(0,0,0,.2);pointer-events:none;min-width:250px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.done{border-left-color:var(--done);}
+.toast.error{border-left-color:var(--danger);}
+
+.act-loading{text-align:center;padding:32px;color:var(--muted);font-family:var(--font);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;}
+.empty-state{text-align:center;padding:32px 20px;color:var(--muted);}
+.empty-state .icon{font-size:36px;margin-bottom:8px;}
+.empty-state p{font-family:var(--font);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;}
+.email-targets{background:var(--off);border:1px solid var(--border);border-radius:5px;padding:9px 12px;font-size:13px;color:var(--text);margin-bottom:10px;}
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="ld-logo">PROSPECT<em>Manager</em><sup>™</sup></div>
+  <div class="ld-spin"></div>
+  <div class="ld-text">CRM · Loading…</div>
+</div>
+
+<div id="loginWrap" style="display:none;flex:1;">
+  <div class="lcard">
+    <div class="lcard-logo">PROSPECT<em>Manager</em><sup>™</sup></div>
+    <div class="lcard-badge">CRM</div>
+    <div class="lf-group">
+      <label class="lf-label" for="loginEmail">Email</label>
+      <input class="lf-input" type="email" id="loginEmail" placeholder="you@example.com">
+    </div>
+    <div class="lf-group">
+      <label class="lf-label" for="loginPass">Password</label>
+      <input class="lf-input" type="password" id="loginPass" placeholder="••••••••">
+    </div>
+    <div class="login-err" id="loginErr"></div>
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">Sign In</button>
+  </div>
+</div>
+
+<div id="app" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+  <header>
+    <div class="h-logo">
+      PROSPECT<em>Manager</em><sup>™</sup>
+      <span class="h-badge">CRM</span>
+    </div>
+    <div class="h-right">
+      <span class="h-user" id="hdrUser"></span>
+      <button class="hbtn danger" onclick="doLogout()">Sign Out</button>
+    </div>
+  </header>
+
+  <div class="main">
+    <div class="screen active" id="screen-customers">
+
+      <!-- LIST VIEW -->
+      <div id="view-list" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+        <div class="toolbar">
+          <span class="tb-title">Customers</span>
+          <input class="tb-search" type="search" id="custSearch" placeholder="Search…" oninput="renderTable()">
+          <select class="tb-search" id="custStatus" onchange="renderTable()" style="width:150px;">
+            <option value="">All statuses</option>
+            <option value="active">Active</option>
+            <option value="trial">Trial</option>
+            <option value="contra">Contra</option>
+            <option value="lapsed">Lapsed</option>
+            <option value="prospect">Prospect</option>
+          </select>
+          <div class="tb-sep"></div>
+          <button class="tb-btn" onclick="openCustomerModal()">+ Add Customer</button>
+        </div>
+        <div class="list-scroll">
+          <div class="stats-row">
+            <div class="stat-card active"><div class="stat-val" id="s-active">—</div><div class="stat-lbl">Active</div></div>
+            <div class="stat-card trial"><div class="stat-val" id="s-trial">—</div><div class="stat-lbl">Trial</div></div>
+            <div class="stat-card contra"><div class="stat-val" id="s-contra">—</div><div class="stat-lbl">Contra</div></div>
+            <div class="stat-card lapsed"><div class="stat-val" id="s-lapsed">—</div><div class="stat-lbl">Lapsed</div></div>
+            <div class="stat-card prospect"><div class="stat-val" id="s-prospect">—</div><div class="stat-lbl">Prospect</div></div>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Company</th><th>Primary Contact</th><th>Status</th><th>Plan</th><th>Town</th><th>Last Activity</th></tr></thead>
+              <tbody id="custTbody"><tr><td colspan="6" class="act-loading">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROFILE VIEW -->
+      <div id="view-profile" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+        <div class="toolbar">
+          <button class="tb-btn" onclick="showList()">← Back</button>
+          <span class="tb-title" id="profileTitle">Customer</span>
+          <div class="tb-sep"></div>
+          <button class="tb-btn" onclick="openCustomerModal(currentId)">Edit Details</button>
+          <button class="tb-btn" onclick="openSubModal()">Subscription</button>
+          <button class="tb-btn" onclick="openContactModal()">+ Contact</button>
+          <button class="tb-btn" onclick="openCommModal()">+ Activity</button>
+          <button class="tb-btn" onclick="openEmailModal()">✉ Email</button>
+        </div>
+        <div class="profile-scroll">
+          <div class="profile-grid">
+            <div class="profile-left">
+              <div class="card">
+                <div class="card-hdr"><h3>Company Details</h3><span id="profileBadge"></span></div>
+                <div class="card-body" id="profileCompanyBody"></div>
+              </div>
+              <div class="card">
+                <div class="card-hdr"><h3>Subscription</h3></div>
+                <div class="card-body" id="profileSubBody"></div>
+              </div>
+              <div class="card">
+                <div class="card-hdr"><h3>Contacts</h3></div>
+                <div class="card-body" id="profileContacts"></div>
+              </div>
+            </div>
+            <div class="profile-right">
+              <div class="card">
+                <div class="card-hdr"><h3>Communication Log</h3></div>
+                <div class="card-body" id="profileComms"><div class="act-loading">Loading…</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- MODAL: CUSTOMER -->
+<div class="modal-overlay" id="modalCustomer">
+  <div class="modal">
+    <div class="modal-hdr"><h2 id="mCustTitle">Add Customer</h2><button class="modal-xbtn" onclick="closeModal('modalCustomer')">×</button></div>
+    <div class="modal-body">
+      <div class="sec-lbl">Company</div>
+      <div class="frow">
+        <div class="mfield"><div class="mlabel">Company Name *</div><input class="minput" id="fCo" type="text"></div>
+        <div class="mfield"><div class="mlabel">Website</div><input class="minput" id="fWeb" type="url" placeholder="https://"></div>
+      </div>
+      <div class="mfield"><div class="mlabel">Status *</div>
+        <select class="minput" id="fSt">
+          <option value="active">Active</option><option value="trial">Trial</option>
+          <option value="contra">Contra</option><option value="lapsed">Lapsed</option>
+          <option value="prospect">Prospect</option>
+        </select>
+      </div>
+      <div class="sec-lbl">Address</div>
+      <div class="mfield"><div class="mlabel">Address Line 1</div><input class="minput" id="fA1" type="text"></div>
+      <div class="mfield"><div class="mlabel">Address Line 2</div><input class="minput" id="fA2" type="text"></div>
+      <div class="frow">
+        <div class="mfield"><div class="mlabel">Town</div><input class="minput" id="fTown" type="text"></div>
+        <div class="mfield"><div class="mlabel">County</div><input class="minput" id="fCounty" type="text"></div>
+      </div>
+      <div class="frow">
+        <div class="mfield"><div class="mlabel">Postcode</div><input class="minput" id="fPC" type="text"></div>
+        <div class="mfield"><div class="mlabel">Country</div><input class="minput" id="fCty" type="text" value="UK"></div>
+      </div>
+      <div class="sec-lbl">Notes</div>
+      <div class="mfield"><textarea class="minput" id="fNotes" style="min-height:68px;resize:vertical;" placeholder="Internal notes…"></textarea></div>
+    </div>
+    <div class="modal-ftr">
+      <button class="mbtn mbtn-cancel" onclick="closeModal('modalCustomer')">Cancel</button>
+      <button class="mbtn mbtn-primary" onclick="saveCustomer()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CONTACT -->
+<div class="modal-overlay" id="modalContact">
+  <div class="modal">
+    <div class="modal-hdr"><h2>Add Contact</h2><button class="modal-xbtn" onclick="closeModal('modalContact')">×</button></div>
+    <div class="modal-body">
+      <div class="frow">
+        <div class="mfield"><div class="mlabel">First Name *</div><input class="minput" id="cfFirst" type="text"></div>
+        <div class="mfield"><div class="mlabel">Last Name *</div><input class="minput" id="cfLast" type="text"></div>
+      </div>
+      <div class="mfield"><div class="mlabel">Job Title</div><input class="minput" id="cfTitle" type="text"></div>
+      <div class="frow">
+        <div class="mfield"><div class="mlabel">Email</div><input class="minput" id="cfEmail" type="email"></div>
+        <div class="mfield"><div class="mlabel">Phone</div><input class="minput" id="cfPhone" type="tel"></div>
+      </div>
+      <div class="frow">
+        <div class="mfield"><div class="mlabel">Mobile</div><input class="minput" id="cfMobile" type="tel"></div>
+        <div class="mfield"><div class="mlabel">Primary?</div>
+          <select class="minput" id="cfPrimary"><option value="false">No</option><option value="true">Yes — Primary</option></select>
+        </div>
+      </div>
+      <div class="mfield"><div class="mlabel">Notes</div><textarea class="minput" id="cfNotes" style="min-height:60px;resize:vertical;"></textarea></div>
+    </div>
+    <div class="modal-ftr">
+      <button class="mbtn mbtn-cancel" onclick="closeModal('modalContact')">Cancel</button>
+      <button class="mbtn mbtn-primary" onclick="saveContact()">Save Contact</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: SUBSCRIPTION -->
+<div class="modal-overlay" id="modalSub">
+  <div class="modal">
+    <div class="modal-hdr"><h2>Subscription</h2><button class="modal-xbtn" onclick="closeModal('modalSub')">×</button></div>
+    <div class="modal-body">
+      <div class="mfield"><div class="mlabel">Plan Name *</div><input class="minput" id="sPlan" type="text" placeholder="e.g. ProspectManager Pro"></div>
+      <div class="frow">
+        <div class="mfield"><div class="mlabel">Price £ / period</div><input class="minput" id="sPrice" type="number" step="0.01" min="0"></div>
+        <div class="mfield"><div class="mlabel">Billing Cycle</div>
+          <select class="minput" id="sCycle">
+            <option value="monthly">Monthly</option><option value="annual">Annual</option>
+            <option value="one-off">One-off</option><option value="contra">Contra</option><option value="free">Free</option>
+          </select>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="mfield"><div class="mlabel">Start Date</div><input class="minput" id="sStart" type="date"></div>
+        <div class="mfield"><div class="mlabel">End Date</div><input class="minput" id="sEnd" type="date"></div>
+      </div>
+      <div class="frow">
+        <div class="mfield"><div class="mlabel">Free Trial?</div>
+          <select class="minput" id="sTrial"><option value="false">No</option><option value="true">Yes</option></select>
+        </div>
+        <div class="mfield"><div class="mlabel">Trial Ends</div><input class="minput" id="sTrialEnd" type="date"></div>
+      </div>
+      <div class="mfield"><div class="mlabel">Contra Deal?</div>
+        <select class="minput" id="sContra"><option value="false">No</option><option value="true">Yes</option></select>
+      </div>
+      <div class="mfield"><div class="mlabel">Notes</div><textarea class="minput" id="sNotes" style="min-height:60px;resize:vertical;"></textarea></div>
+    </div>
+    <div class="modal-ftr">
+      <button class="mbtn mbtn-cancel" onclick="closeModal('modalSub')">Cancel</button>
+      <button class="mbtn mbtn-primary" onclick="saveSub()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: LOG ACTIVITY -->
+<div class="modal-overlay" id="modalComm">
+  <div class="modal">
+    <div class="modal-hdr"><h2>Log Activity</h2><button class="modal-xbtn" onclick="closeModal('modalComm')">×</button></div>
+    <div class="modal-body">
+      <div class="frow">
+        <div class="mfield"><div class="mlabel">Type *</div>
+          <select class="minput" id="cType">
+            <option value="call">📞 Call</option><option value="email">✉️ Email</option>
+            <option value="meeting">🤝 Meeting</option><option value="note" selected>📝 Note</option>
+            <option value="task">✅ Task</option>
+          </select>
+        </div>
+        <div class="mfield"><div class="mlabel">Direction</div>
+          <select class="minput" id="cDir">
+            <option value="outbound">Outbound</option>
+            <option value="inbound">Inbound</option>
+            <option value="internal">Internal</option>
+          </select>
+        </div>
+      </div>
+      <div class="mfield"><div class="mlabel">Date/Time *</div><input class="minput" id="cDate" type="datetime-local"></div>
+      <div class="mfield"><div class="mlabel">Subject</div><input class="minput" id="cSubj" type="text"></div>
+      <div class="mfield"><div class="mlabel">Notes</div><textarea class="minput" id="cBody" style="min-height:90px;resize:vertical;"></textarea></div>
+    </div>
+    <div class="modal-ftr">
+      <button class="mbtn mbtn-cancel" onclick="closeModal('modalComm')">Cancel</button>
+      <button class="mbtn mbtn-primary" onclick="saveComm()">Log Activity</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: SEND EMAIL -->
+<div class="modal-overlay" id="modalEmail">
+  <div class="modal" style="width:580px;">
+    <div class="modal-hdr"><h2>Send Email</h2><button class="modal-xbtn" onclick="closeModal('modalEmail')">×</button></div>
+    <div class="modal-body">
+      <div class="mfield">
+        <div class="mlabel">To</div>
+        <div class="email-targets" id="eToDisplay">—</div>
+        <select class="minput" id="eContactSel" onchange="updateEmailTo()">
+          <option value="">— select contact —</option>
+        </select>
+      </div>
+      <div class="mfield"><div class="mlabel">Subject *</div><input class="minput" id="eSubj" type="text"></div>
+      <div class="mfield"><div class="mlabel">Message *</div><textarea class="minput" id="eBody" style="min-height:150px;resize:vertical;"></textarea></div>
+    </div>
+    <div class="modal-ftr">
+      <button class="mbtn mbtn-cancel" onclick="closeModal('modalEmail')">Cancel</button>
+      <button class="mbtn mbtn-teal" onclick="sendEmail()">✉ Send Email</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SB_URL = 'https://zmnofnsvonarpevzrkuo.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inptbm9mbnN2b25hcnBldnpya3VvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MTE5NzYsImV4cCI6MjA4ODk4Nzk3Nn0.1xvTgXFBDiyEFUtziIaZ0s7mByEu3wZsg29eStU13ao';
+const FROM_EMAIL = 'crm@prospectmanager.co.uk';
+const FROM_NAME  = 'ProspectManager CRM';
+const { createClient } = supabase;
+const sb = createClient(SB_URL, SB_KEY);
+
+let allCustomers = [], currentId = null, editingSubId = null, _token = null;
+
+// ── INIT ──
+async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  document.getElementById('loading').style.display = 'none';
+  if (session) { _token = session.access_token; showApp(session.user.email); await loadCustomers(); }
+  else showLogin();
+}
+sb.auth.onAuthStateChange((event, session) => { if (session) _token = session.access_token; });
+
+function showApp(email) {
+  document.getElementById('loginWrap').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('hdrUser').textContent = email;
+}
+function showLogin() {
+  document.getElementById('loginWrap').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+}
+
+// ── AUTH ──
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginErr');
+  const btn   = document.getElementById('loginBtn');
+  errEl.style.display = 'none';
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  btn.disabled = false; btn.textContent = 'Sign In';
+  if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; return; }
+  _token = data.session.access_token;
+  showApp(data.user.email);
+  await loadCustomers();
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('loginWrap').style.display !== 'none') doLogin();
+});
+async function doLogout() { await sb.auth.signOut(); showLogin(); }
+
+// ── CUSTOMERS ──
+async function loadCustomers() {
+  const { data, error } = await sb.from('crm_customers')
+    .select('*, crm_contacts(*), crm_subscriptions(*), crm_communications(id,occurred_at)')
+    .order('company_name');
+  if (error) { showToast('Load failed: ' + error.message, 'error'); return; }
+  allCustomers = data || [];
+  updateStats(); renderTable();
+}
+
+function updateStats() {
+  const c = { active:0, trial:0, contra:0, lapsed:0, prospect:0 };
+  allCustomers.forEach(x => { if (c[x.status] !== undefined) c[x.status]++; });
+  Object.keys(c).forEach(k => { document.getElementById('s-' + k).textContent = c[k]; });
+}
+
+function renderTable() {
+  const q  = (document.getElementById('custSearch').value || '').toLowerCase();
+  const st = document.getElementById('custStatus').value;
+  const rows = allCustomers.filter(c => {
+    const p = (c.crm_contacts||[]).find(x=>x.is_primary)||(c.crm_contacts||[])[0];
+    const m = (c.company_name||'').toLowerCase().includes(q)||(c.town||'').toLowerCase().includes(q)
+              ||(p?`${p.first_name} ${p.last_name}`.toLowerCase().includes(q):false);
+    return m && (!st||c.status===st);
+  });
+  const tbody = document.getElementById('custTbody');
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="icon">🏢</div><p>No customers found</p></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(c => {
+    const p = (c.crm_contacts||[]).find(x=>x.is_primary)||(c.crm_contacts||[])[0];
+    const sub = (c.crm_subscriptions||[]).find(x=>x.is_current);
+    const comms = (c.crm_communications||[]).sort((a,b)=>new Date(b.occurred_at)-new Date(a.occurred_at));
+    return `<tr onclick="openProfile('${c.id}')">
+      <td class="td-co">${esc(c.company_name)}</td>
+      <td>${p?`${esc(p.first_name)} ${esc(p.last_name)}`:'—'}</td>
+      <td><span class="badge badge-${c.status}">${c.status}</span></td>
+      <td>${sub?esc(sub.plan_name):'—'}</td>
+      <td>${esc(c.town||'—')}</td>
+      <td>${comms[0]?fmtDate(comms[0].occurred_at):'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── PROFILE ──
+async function openProfile(id) {
+  currentId = id;
+  document.getElementById('view-list').style.display = 'none';
+  document.getElementById('view-profile').style.display = 'flex';
+  await renderProfile();
+}
+function showList() {
+  currentId = null;
+  document.getElementById('view-list').style.display = 'flex';
+  document.getElementById('view-profile').style.display = 'none';
+}
+async function renderProfile() {
+  const { data: c, error } = await sb.from('crm_customers')
+    .select('*, crm_contacts(*), crm_subscriptions(*), crm_communications(*)')
+    .eq('id', currentId).single();
+  if (error || !c) { showToast('Could not load customer', 'error'); return; }
+
+  document.getElementById('profileTitle').textContent = c.company_name;
+  document.getElementById('profileBadge').innerHTML = `<span class="badge badge-${c.status}" style="margin-left:6px;">${c.status}</span>`;
+
+  const addr = [c.address_line1,c.address_line2,c.town,c.county,c.postcode,c.country].filter(Boolean);
+  document.getElementById('profileCompanyBody').innerHTML = [
+    c.website?`<div class="info-row"><div class="info-lbl">Website</div><div class="info-val"><a href="${esc(c.website)}" target="_blank">${esc(c.website)}</a></div></div>`:'',
+    addr.length?`<div class="info-row"><div class="info-lbl">Address</div><div class="info-val">${addr.map(esc).join('<br>')}</div></div>`:'',
+    c.notes?`<div class="info-row"><div class="info-lbl">Notes</div><div class="info-val">${esc(c.notes)}</div></div>`:'',
+  ].join('')||`<div class="empty-state" style="padding:12px;"><p>No details added</p></div>`;
+
+  const sub = (c.crm_subscriptions||[]).find(s=>s.is_current);
+  document.getElementById('profileSubBody').innerHTML = sub ? [
+    `<div class="info-row"><div class="info-lbl">Plan</div><div class="info-val">${esc(sub.plan_name)}</div></div>`,
+    sub.price_gbp!=null?`<div class="info-row"><div class="info-lbl">Price</div><div class="info-val">£${Number(sub.price_gbp).toFixed(2)} / ${sub.billing_cycle}</div></div>`:'',
+    `<div class="info-row"><div class="info-lbl">Started</div><div class="info-val">${fmtDate(sub.starts_at)}</div></div>`,
+    sub.ends_at?`<div class="info-row"><div class="info-lbl">Ends</div><div class="info-val">${fmtDate(sub.ends_at)}</div></div>`:'',
+    sub.is_free_trial?`<div class="info-row"><div class="info-lbl">Trial Ends</div><div class="info-val">${fmtDate(sub.trial_ends_at)}</div></div>`:'',
+    sub.is_contra?`<div class="info-row"><div class="info-val"><span class="badge badge-contra">Contra Deal</span></div></div>`:'',
+    sub.notes?`<div class="info-row"><div class="info-lbl">Notes</div><div class="info-val">${esc(sub.notes)}</div></div>`:'',
+  ].join('') : `<div class="empty-state" style="padding:12px;"><p>No subscription</p></div>`;
+
+  const contacts = [...(c.crm_contacts||[])].sort((a,b)=>b.is_primary-a.is_primary);
+  document.getElementById('profileContacts').innerHTML = contacts.length
+    ? contacts.map(ct=>`<div class="contact-card">
+        ${ct.is_primary?'<span class="badge badge-active" style="float:right;">Primary</span>':''}
+        <div class="contact-name">${esc(ct.first_name)} ${esc(ct.last_name)}</div>
+        <div class="contact-job">${esc(ct.job_title||'')}</div>
+        ${ct.email?`<div class="contact-detail">✉️ <a href="mailto:${esc(ct.email)}">${esc(ct.email)}</a></div>`:''}
+        ${ct.phone?`<div class="contact-detail">📞 ${esc(ct.phone)}</div>`:''}
+        ${ct.mobile?`<div class="contact-detail">📱 ${esc(ct.mobile)}</div>`:''}
+      </div>`).join('')
+    : `<div class="empty-state" style="padding:12px;"><p>No contacts</p></div>`;
+
+  const icons = {call:'📞',email:'✉️',meeting:'🤝',note:'📝',task:'✅'};
+  const comms = [...(c.crm_communications||[])].sort((a,b)=>new Date(b.occurred_at)-new Date(a.occurred_at));
+  document.getElementById('profileComms').innerHTML = comms.length
+    ? comms.map(cm=>`<div class="comm-item">
+        <div class="comm-icon ${cm.comm_type}">${icons[cm.comm_type]||'📝'}</div>
+        <div style="flex:1;">
+          <div class="comm-subj">${esc(cm.subject||cm.comm_type)}</div>
+          ${cm.body?`<div class="comm-txt">${esc(cm.body)}</div>`:''}
+          <div class="comm-meta">${fmtDateTime(cm.occurred_at)} · ${cm.direction}</div>
+        </div>
+      </div>`).join('')
+    : `<div class="empty-state"><div class="icon">💬</div><p>No communications yet</p></div>`;
+}
+
+// ── MODALS ──
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(bg => {
+  bg.addEventListener('click', e => { if (e.target === bg) bg.classList.remove('open'); });
+});
+
+// Customer
+function openCustomerModal(id=null) {
+  ['fCo','fWeb','fA1','fA2','fTown','fCounty','fPC','fNotes'].forEach(f=>{const el=document.getElementById(f);if(el)el.value='';});
+  document.getElementById('fCty').value='UK';
+  document.getElementById('fSt').value='active';
+  if (id) {
+    const c = allCustomers.find(x=>x.id===id);
+    if (c) {
+      document.getElementById('fCo').value    = c.company_name||'';
+      document.getElementById('fWeb').value   = c.website||'';
+      document.getElementById('fSt').value    = c.status||'active';
+      document.getElementById('fA1').value    = c.address_line1||'';
+      document.getElementById('fA2').value    = c.address_line2||'';
+      document.getElementById('fTown').value  = c.town||'';
+      document.getElementById('fCounty').value= c.county||'';
+      document.getElementById('fPC').value    = c.postcode||'';
+      document.getElementById('fCty').value   = c.country||'UK';
+      document.getElementById('fNotes').value = c.notes||'';
+    }
+    document.getElementById('mCustTitle').textContent = 'EDIT CUSTOMER';
+    document.getElementById('modalCustomer').dataset.editId = id;
+  } else {
+    document.getElementById('mCustTitle').textContent = 'ADD CUSTOMER';
+    delete document.getElementById('modalCustomer').dataset.editId;
+  }
+  openModal('modalCustomer');
+}
+async function saveCustomer() {
+  const name = document.getElementById('fCo').value.trim();
+  if (!name) { showToast('Company name required', 'error'); return; }
+  const payload = {
+    company_name: name,
+    website:      document.getElementById('fWeb').value.trim()||null,
+    status:       document.getElementById('fSt').value,
+    address_line1:document.getElementById('fA1').value.trim()||null,
+    address_line2:document.getElementById('fA2').value.trim()||null,
+    town:         document.getElementById('fTown').value.trim()||null,
+    county:       document.getElementById('fCounty').value.trim()||null,
+    postcode:     document.getElementById('fPC').value.trim()||null,
+    country:      document.getElementById('fCty').value.trim()||'UK',
+    notes:        document.getElementById('fNotes').value.trim()||null,
+  };
+  const editId = document.getElementById('modalCustomer').dataset.editId;
+  let error;
+  if (editId) ({ error } = await sb.from('crm_customers').update(payload).eq('id', editId));
+  else        ({ error } = await sb.from('crm_customers').insert(payload));
+  if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
+  showToast(editId ? 'Customer updated' : 'Customer added', 'done');
+  closeModal('modalCustomer');
+  await loadCustomers();
+  if (editId && currentId === editId) await renderProfile();
+}
+
+// Contact
+function openContactModal() {
+  ['cfFirst','cfLast','cfTitle','cfEmail','cfPhone','cfMobile','cfNotes'].forEach(f=>{document.getElementById(f).value='';});
+  document.getElementById('cfPrimary').value='false';
+  openModal('modalContact');
+}
+async function saveContact() {
+  const first = document.getElementById('cfFirst').value.trim();
+  const last  = document.getElementById('cfLast').value.trim();
+  if (!first||!last) { showToast('Name required', 'error'); return; }
+  const { error } = await sb.from('crm_contacts').insert({
+    customer_id: currentId,
+    first_name:  first, last_name: last,
+    job_title:   document.getElementById('cfTitle').value.trim()||null,
+    email:       document.getElementById('cfEmail').value.trim()||null,
+    phone:       document.getElementById('cfPhone').value.trim()||null,
+    mobile:      document.getElementById('cfMobile').value.trim()||null,
+    is_primary:  document.getElementById('cfPrimary').value==='true',
+    notes:       document.getElementById('cfNotes').value.trim()||null,
+  });
+  if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
+  showToast('Contact added', 'done');
+  closeModal('modalContact');
+  await renderProfile();
+}
+
+// Subscription
+async function openSubModal() {
+  const { data } = await sb.from('crm_subscriptions').select('*').eq('customer_id',currentId).eq('is_current',true).limit(1);
+  const s = data&&data[0];
+  editingSubId = s?s.id:null;
+  document.getElementById('sPlan').value     = s?s.plan_name||''    :'';
+  document.getElementById('sPrice').value    = s?s.price_gbp||''    :'';
+  document.getElementById('sCycle').value    = s?s.billing_cycle||'monthly':'monthly';
+  document.getElementById('sStart').value    = s?(s.starts_at||''  ):todayStr();
+  document.getElementById('sEnd').value      = s?(s.ends_at||''    ):'';
+  document.getElementById('sTrial').value    = s?String(s.is_free_trial):'false';
+  document.getElementById('sTrialEnd').value = s?(s.trial_ends_at||''):'';
+  document.getElementById('sContra').value   = s?String(s.is_contra):'false';
+  document.getElementById('sNotes').value    = s?s.notes||''        :'';
+  openModal('modalSub');
+}
+async function saveSub() {
+  const plan = document.getElementById('sPlan').value.trim();
+  if (!plan) { showToast('Plan name required', 'error'); return; }
+  const payload = {
+    customer_id:   currentId, plan_name: plan,
+    price_gbp:     document.getElementById('sPrice').value||null,
+    billing_cycle: document.getElementById('sCycle').value,
+    starts_at:     document.getElementById('sStart').value||todayStr(),
+    ends_at:       document.getElementById('sEnd').value||null,
+    is_free_trial: document.getElementById('sTrial').value==='true',
+    trial_ends_at: document.getElementById('sTrialEnd').value||null,
+    is_contra:     document.getElementById('sContra').value==='true',
+    notes:         document.getElementById('sNotes').value.trim()||null,
+    is_current:    true,
+  };
+  let error;
+  if (editingSubId) ({ error } = await sb.from('crm_subscriptions').update(payload).eq('id',editingSubId));
+  else              ({ error } = await sb.from('crm_subscriptions').insert(payload));
+  if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
+  showToast('Subscription saved', 'done');
+  closeModal('modalSub');
+  await renderProfile();
+}
+
+// Communication
+function openCommModal() {
+  document.getElementById('cType').value='note';
+  document.getElementById('cDir').value='outbound';
+  document.getElementById('cSubj').value='';
+  document.getElementById('cBody').value='';
+  document.getElementById('cDate').value=nowLocalStr();
+  openModal('modalComm');
+}
+async function saveComm() {
+  const dateVal = document.getElementById('cDate').value;
+  if (!dateVal) { showToast('Date/time required', 'error'); return; }
+  const { data: { user } } = await sb.auth.getUser();
+  const { error } = await sb.from('crm_communications').insert({
+    customer_id: currentId, logged_by: user?.id||null,
+    comm_type:   document.getElementById('cType').value,
+    direction:   document.getElementById('cDir').value,
+    subject:     document.getElementById('cSubj').value.trim()||null,
+    body:        document.getElementById('cBody').value.trim()||null,
+    occurred_at: new Date(dateVal).toISOString(),
+  });
+  if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
+  showToast('Activity logged', 'done');
+  closeModal('modalComm');
+  await renderProfile();
+}
+
+// Email
+async function openEmailModal() {
+  const { data: contacts } = await sb.from('crm_contacts').select('*').eq('customer_id',currentId);
+  const sel = document.getElementById('eContactSel');
+  sel.innerHTML = '<option value="">— select contact —</option>';
+  (contacts||[]).forEach(ct=>{
+    const opt = document.createElement('option');
+    opt.value = ct.email||'';
+    opt.textContent = `${ct.first_name} ${ct.last_name}${ct.email?' <'+ct.email+'>':' (no email)'}`;
+    opt.dataset.name = `${ct.first_name} ${ct.last_name}`;
+    sel.appendChild(opt);
+  });
+  const p = (contacts||[]).find(c=>c.is_primary)||(contacts||[])[0];
+  if (p&&p.email) {
+    sel.value = p.email;
+    document.getElementById('eToDisplay').textContent = `${p.first_name} ${p.last_name} <${p.email}>`;
+  } else { document.getElementById('eToDisplay').textContent = '— no contact selected —'; }
+  document.getElementById('eSubj').value='';
+  document.getElementById('eBody').value='';
+  openModal('modalEmail');
+}
+function updateEmailTo() {
+  const sel = document.getElementById('eContactSel');
+  const opt = sel.options[sel.selectedIndex];
+  document.getElementById('eToDisplay').textContent = sel.value?`${opt.dataset.name} <${sel.value}>`:'— no contact selected —';
+}
+async function sendEmail() {
+  const toEmail = document.getElementById('eContactSel').value;
+  const subject = document.getElementById('eSubj').value.trim();
+  const body    = document.getElementById('eBody').value.trim();
+  const sel     = document.getElementById('eContactSel');
+  const toName  = sel.options[sel.selectedIndex]?.dataset?.name||'';
+  if (!toEmail) { showToast('Select a contact with an email', 'error'); return; }
+  if (!subject) { showToast('Subject required', 'error'); return; }
+  if (!body)    { showToast('Message required', 'error'); return; }
+  try {
+    const resp = await fetch(`${SB_URL}/functions/v1/send-email`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${_token}`},
+      body:JSON.stringify({to:toEmail,from_email:FROM_EMAIL,from_name:FROM_NAME,subject,body:body.replace(/\n/g,'<br>'),skip_cc:true}),
+    });
+    if (!resp.ok) { const e=await resp.json().catch(()=>({})); showToast('Email failed: '+(e.error||resp.statusText),'error'); return; }
+    const { data:{user} } = await sb.auth.getUser();
+    await sb.from('crm_communications').insert({customer_id:currentId,logged_by:user?.id||null,comm_type:'email',direction:'outbound',subject,body,occurred_at:new Date().toISOString()});
+    showToast('Email sent and logged ✓','done');
+    closeModal('modalEmail');
+    await renderProfile();
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+// ── TOAST ──
+let _tt;
+function showToast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast'+(type?' '+type:'')+' show';
+  clearTimeout(_tt);
+  _tt = setTimeout(()=>{ el.classList.remove('show'); }, 3800);
+}
+
+// ── UTILS ──
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmtDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}
+function fmtDateTime(d){if(!d)return'—';return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}
+function todayStr(){return new Date().toISOString().slice(0,10);}
+function nowLocalStr(){const n=new Date();n.setMinutes(n.getMinutes()-n.getTimezoneOffset());return n.toISOString().slice(0,16);}
+
+init();
+</script>
+</body>
+</html>
