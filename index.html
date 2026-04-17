@@ -1505,6 +1505,30 @@ function parseImportHtml() {
   var rows = doc.querySelectorAll('table tr');
   importCustomers = [];
 
+  console.log('[IMPORT] Total table rows found:', rows.length);
+  console.log('[IMPORT] Total tables found:', doc.querySelectorAll('table').length);
+
+  // Log first 5 rows in detail
+  for (var k = 0; k < Math.min(5, rows.length); k++) {
+    var r = rows[k];
+    var cs = r.querySelectorAll('td');
+    var cellTexts = [].map.call(cs, function(c) { return '"' + c.textContent.trim().substring(0, 40) + '"'; });
+    console.log('[IMPORT] Row ' + k + ' - ' + cs.length + ' cells:', cellTexts.join(' | '));
+    if (cs.length > 0) {
+      console.log('[IMPORT] Row ' + k + ' LAST cell:', JSON.stringify(cs[cs.length - 1].textContent.trim()));
+    }
+  }
+
+  // Collect every unique status value seen in last cells for diagnosis
+  var seenStatuses = {};
+  rows.forEach(function(row) {
+    var cells = row.querySelectorAll('td');
+    if (cells.length < 4) return;
+    var s = cells[cells.length - 1].textContent.trim();
+    seenStatuses[s] = (seenStatuses[s] || 0) + 1;
+  });
+  console.log('[IMPORT] Unique last-cell values across all >=4-cell rows:', seenStatuses);
+
   rows.forEach(function(row) {
     var cells = row.querySelectorAll('td');
     if (cells.length < 4) return;
@@ -1522,6 +1546,8 @@ function parseImportHtml() {
     var postcode = cells[cells.length - 2].textContent.trim();
     importCustomers.push({ pk: pk, company: company, contact: contact, postcode: postcode });
   });
+
+  console.log('[IMPORT] Matched OK customers:', importCustomers.length);
 
   if (!importCustomers.length) {
     showToast('No OK customers found in the pasted HTML. Make sure you pasted the full page source.', 'error');
