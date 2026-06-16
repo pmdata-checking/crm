@@ -218,6 +218,13 @@ tbody td{padding:10px 14px;font-size:13px;}
 .modal .modal-input{width:100%;border:1.5px solid var(--border);border-radius:5px;font-family:var(--body);font-size:14px;padding:9px 12px;color:var(--text);}
 .modal .modal-input:focus{outline:none;border-color:var(--green);}
 .modal .modal-actions{padding:14px 20px 20px;display:flex;gap:10px;}
+/* Reactivation pipeline */
+.fu-overdue{color:#c0392b;font-weight:600;}
+.fu-today{color:#b8860b;font-weight:600;}
+.badge-stage{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;background:rgba(70,110,160,.25);border:1px solid rgba(120,160,210,.4);white-space:nowrap;}
+.td-next{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pipe-input{width:100%;border:1.5px solid var(--border);border-radius:5px;font-family:var(--body);font-size:13px;padding:7px 10px;color:var(--text);}
+.pipe-input:focus{outline:none;border-color:var(--green);}
 </style>
 </head>
 <body>
@@ -304,6 +311,17 @@ tbody td{padding:10px 14px;font-size:13px;}
             <option value="lapsed">Lapsed</option>
             <option value="prospect">Prospect</option>
           </select>
+          <select class="tb-search" id="custStage" onchange="renderTable()" style="width:160px;">
+            <option value="">All stages</option>
+            <option value="new">New</option>
+            <option value="researching">Researching</option>
+            <option value="contacted">Contacted</option>
+            <option value="in conversation">In conversation</option>
+            <option value="quoted">Quoted</option>
+            <option value="won">Won</option>
+            <option value="lost">Lost</option>
+            <option value="on hold">On hold</option>
+          </select>
           <div class="tb-sep"></div>
           <button class="tb-btn" onclick="openCustomerModal()">+ Add Customer</button>
           <button class="tb-btn" id="bulkDeleteBtn" onclick="deleteSelectedCustomers()" style="display:none;background:rgba(192,57,43,.35);border-color:rgba(255,130,110,.5);">Delete Selected (<span id="bulkDeleteCount">0</span>)</button>
@@ -318,8 +336,8 @@ tbody td{padding:10px 14px;font-size:13px;}
           </div>
           <div class="tbl-wrap">
             <table>
-              <thead><tr id="custThead"><th>Company</th><th>Primary Contact</th><th>Status</th><th>Plan</th><th>Town</th><th>Last Activity</th></tr></thead>
-              <tbody id="custTbody"><tr><td colspan="6" class="act-loading">Loading&hellip;</td></tr></tbody>
+              <thead><tr id="custThead"><th>Company</th><th>Stage</th><th>Next Action</th><th>Follow-up</th><th>Primary Contact</th><th>Status</th><th>Plan</th><th>Town</th><th>Last Activity</th></tr></thead>
+              <tbody id="custTbody"><tr><td colspan="9" class="act-loading">Loading&hellip;</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -332,7 +350,7 @@ tbody td{padding:10px 14px;font-size:13px;}
           <span class="tb-title" id="profileTitle">Customer</span>
           <div class="tb-sep"></div>
           <button class="tb-btn" onclick="openCustomerModal(currentId)">Edit Details</button>
-          <button class="tb-btn" onclick="openSubModal()">Subscription</button>
+          <button class="tb-btn" id="subBtn" onclick="openSubModal()">Subscription</button>
           <button class="tb-btn" onclick="openContactModal()">+ Contact</button>
           <button class="tb-btn" onclick="openCommModal()">+ Activity</button>
           <button class="tb-btn" onclick="openEmailModal()">&#9993; Email</button>
@@ -346,6 +364,27 @@ tbody td{padding:10px 14px;font-size:13px;}
                 <div class="card-body" id="profileCompanyBody"></div>
               </div>
               <div class="card">
+                <div class="card-hdr"><h3>Reactivation Pipeline</h3></div>
+                <div class="card-body">
+                  <div class="info-row"><div class="info-lbl">Stage</div>
+                    <div class="info-val"><select id="pStage" class="pipe-input">
+                      <option value="new">New</option>
+                      <option value="researching">Researching</option>
+                      <option value="contacted">Contacted</option>
+                      <option value="in conversation">In conversation</option>
+                      <option value="quoted">Quoted</option>
+                      <option value="won">Won</option>
+                      <option value="lost">Lost</option>
+                      <option value="on hold">On hold</option>
+                    </select></div></div>
+                  <div class="info-row"><div class="info-lbl">Follow-up</div>
+                    <div class="info-val"><input type="date" id="pFollow" class="pipe-input"></div></div>
+                  <div class="info-row"><div class="info-lbl">Next action</div>
+                    <div class="info-val"><input type="text" id="pNext" maxlength="200" class="pipe-input" placeholder="Next step&hellip;"></div></div>
+                  <button class="tb-btn" style="margin-top:10px;" onclick="savePipeline()">Save Pipeline</button>
+                </div>
+              </div>
+              <div class="card" id="subCard">
                 <div class="card-hdr"><h3>Subscription</h3></div>
                 <div class="card-body" id="profileSubBody"></div>
               </div>
@@ -868,14 +907,25 @@ function updateStats() {
 }
 
 function renderTable() {
-  const q  = (document.getElementById('custSearch').value || '').toLowerCase();
-  const st = document.getElementById('custStatus').value;
+  const q   = (document.getElementById('custSearch').value || '').toLowerCase();
+  const st  = document.getElementById('custStatus').value;
+  const stg = document.getElementById('custStage').value;
+  const today = todayStr();
   const rows = allCustomers.filter(c => {
     const p = (c.crm_contacts||[]).find(x => x.is_primary) || (c.crm_contacts||[])[0];
     const m = (c.company_name||'').toLowerCase().includes(q)
            || (c.town||'').toLowerCase().includes(q)
            || (p ? (p.first_name + ' ' + p.last_name).toLowerCase().includes(q) : false);
-    return m && (!st || c.status === st);
+    return m && (!st || c.status === st) && (!stg || c.pipeline_stage === stg);
+  });
+  // Default sort: follow_up_on ASC, NULLs last (overdue + due-today float to top).
+  // Applied AFTER filtering, so a stage filter still sorts by follow-up within that stage.
+  rows.sort((a, b) => {
+    const fa = a.follow_up_on, fb = b.follow_up_on;
+    if (!fa && !fb) return (a.company_name||'').localeCompare(b.company_name||'');
+    if (!fa) return 1;
+    if (!fb) return -1;
+    return fa.localeCompare(fb);
   });
 
   // Update header with select-all checkbox for superusers
@@ -884,11 +934,11 @@ function renderTable() {
     const cbHeader = isSuperuser
       ? '<th style="width:30px;"><input type="checkbox" id="selAllCust" onclick="event.stopPropagation();" onchange="toggleAllCustSelection(this.checked)" style="cursor:pointer;"></th>'
       : '';
-    thead.innerHTML = cbHeader + '<th>Company</th><th>Primary Contact</th><th>Status</th><th>Plan</th><th>Town</th><th>Last Activity</th>';
+    thead.innerHTML = cbHeader + '<th>Company</th><th>Stage</th><th>Next Action</th><th>Follow-up</th><th>Primary Contact</th><th>Status</th><th>Plan</th><th>Town</th><th>Last Activity</th>';
   }
 
   const tbody = document.getElementById('custTbody');
-  const colspan = isSuperuser ? 7 : 6;
+  const colspan = isSuperuser ? 10 : 9;
   if (!rows.length) {
     tbody.innerHTML = '<tr><td colspan="' + colspan + '"><div class="empty-state"><div class="icon">&#127970;</div><p>No customers found</p></div></td></tr>';
     updateBulkDeleteUI();
@@ -901,9 +951,15 @@ function renderTable() {
     const cbCell = isSuperuser
       ? '<td style="width:30px;" onclick="event.stopPropagation();"><input type="checkbox" class="cust-cb" data-id="' + c.id + '" onchange="updateBulkDeleteUI()" style="cursor:pointer;"></td>'
       : '';
+    const fu = c.follow_up_on;
+    const fuCls = fu ? (fu < today ? 'fu-overdue' : (fu === today ? 'fu-today' : '')) : '';
+    const fuTxt = fu ? (fmtDate(fu) + (fu < today ? ' &#9888;' : (fu === today ? ' &bull; today' : ''))) : '&mdash;';
     return '<tr onclick="openProfile(\'' + c.id + '\')">'
       + cbCell
       + '<td class="td-co">' + esc(c.company_name) + '</td>'
+      + '<td><span class="badge-stage">' + esc(c.pipeline_stage || 'new') + '</span></td>'
+      + '<td class="td-next">' + (c.next_action ? esc(c.next_action) : '&mdash;') + '</td>'
+      + '<td class="' + fuCls + '">' + fuTxt + '</td>'
       + '<td>' + (p ? esc(p.first_name) + ' ' + esc(p.last_name) : '&mdash;') + '</td>'
       + '<td><span class="badge badge-' + c.status + '">' + c.status + '</span></td>'
       + '<td>' + (sub ? esc(sub.plan_name) : '&mdash;') + '</td>'
@@ -978,6 +1034,11 @@ async function renderProfile() {
   document.getElementById('profileTitle').textContent = c.company_name;
   document.getElementById('profileBadge').innerHTML = '<span class="badge badge-' + c.status + '" style="margin-left:6px;">' + c.status + '</span>';
 
+  // Reactivation pipeline controls
+  document.getElementById('pStage').value  = c.pipeline_stage || 'new';
+  document.getElementById('pFollow').value = c.follow_up_on || '';
+  document.getElementById('pNext').value   = c.next_action || '';
+
   // Company details
   const addr = [c.address_line1, c.address_line2, c.town, c.county, c.postcode, c.country].filter(Boolean);
   document.getElementById('profileCompanyBody').innerHTML = [
@@ -997,6 +1058,16 @@ async function renderProfile() {
     sub.is_contra ? '<div class="info-row"><div class="info-val"><span class="badge badge-contra">Contra Deal</span></div></div>' : '',
     sub.notes ? '<div class="info-row"><div class="info-lbl">Notes</div><div class="info-val">' + esc(sub.notes) + '</div></div>' : '',
   ].join('') : '<div class="empty-state" style="padding:12px;"><p>No subscription</p></div>';
+
+  // Subscription panel is only active once the company is Won — a not-yet-won
+  // company has no plan. Dim + disable (not remove) otherwise.
+  const isWon = (c.pipeline_stage === 'won');
+  const subCard = document.getElementById('subCard');
+  subCard.style.opacity = isWon ? '' : '0.45';
+  subCard.style.pointerEvents = isWon ? '' : 'none';
+  document.getElementById('subBtn').disabled = !isWon;
+  if (!isWon) document.getElementById('profileSubBody').innerHTML =
+    '<div class="empty-state" style="padding:12px;"><p>Subscription available once stage is <strong>Won</strong></p></div>';
 
   // Contacts
   const contacts = [...(c.crm_contacts||[])].sort((a,b) => b.is_primary - a.is_primary);
@@ -1023,10 +1094,23 @@ async function renderProfile() {
         + '<div style="flex:1;">'
         + '<div class="comm-subj">' + esc(cm.subject || cm.comm_type) + '</div>'
         + (cm.body ? '<div class="comm-txt">' + esc(cm.body) + '</div>' : '')
-        + '<div class="comm-meta">' + fmtDateTime(cm.occurred_at) + ' &middot; ' + cm.direction + '</div>'
+        + '<div class="comm-meta">' + fmtDateTime(cm.occurred_at) + ' &middot; ' + cm.direction + ' &middot; ' + esc(cm.logged_by_name || 'Unknown') + '</div>'
         + '</div></div>'
       ).join('')
     : '<div class="empty-state"><div class="icon">&#128172;</div><p>No communications yet</p></div>';
+}
+
+async function savePipeline() {
+  if (!currentId) return;
+  const payload = {
+    pipeline_stage: document.getElementById('pStage').value,
+    follow_up_on:   document.getElementById('pFollow').value || null,
+    next_action:    document.getElementById('pNext').value.trim() || null,
+  };
+  const { error } = await sb.from('crm_customers').update(payload).eq('id', currentId);
+  if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
+  showToast('Pipeline updated', 'done');
+  await renderProfile();   // re-applies the Won / greyed-subscription logic
 }
 
 // ════════════════════════════════════════════════════════════
@@ -1199,8 +1283,9 @@ async function saveComm() {
   if (!dateVal) { showToast('Date/time required', 'error'); return; }
   const { data: { user } } = await sb.auth.getUser();
   const { error } = await sb.from('crm_communications').insert({
-    customer_id: currentId,
-    logged_by:   user?.id || null,
+    customer_id:    currentId,
+    logged_by:      user?.id || null,
+    logged_by_name: getUserDisplayName(),
     comm_type:   document.getElementById('cType').value,
     direction:   document.getElementById('cDir').value,
     subject:     document.getElementById('cSubj').value.trim() || null,
@@ -1276,8 +1361,9 @@ async function sendEmail() {
     }
     const { data: { user } } = await sb.auth.getUser();
     await sb.from('crm_communications').insert({
-      customer_id: currentId,
-      logged_by:   user?.id || null,
+      customer_id:    currentId,
+      logged_by:      user?.id || null,
+      logged_by_name: getUserDisplayName(),
       comm_type:   'email',
       direction:   'outbound',
       subject,
@@ -1296,8 +1382,19 @@ async function sendEmail() {
 // USERS — Role + Screen
 // ════════════════════════════════════════════════════════════
 async function loadRole() {
-  const { data } = await sb.from('user_roles').select('role').eq('user_email', currentUser.email).single();
-  isSuperuser = data?.role === 'superuser';
+  console.log('[CRM] loadRole() starting for', currentUser && currentUser.email);
+  var role = null;
+  try {
+    var rolePromise = sb.from('user_roles').select('role').eq('user_email', currentUser.email).single();
+    var timeoutPromise = new Promise(function(_, reject) { setTimeout(function() { reject(new Error('loadRole query timed out after 5s')); }, 5000); });
+    var res = await Promise.race([rolePromise, timeoutPromise]);
+    role = res && res.data ? res.data.role : null;
+    if (res && res.error) console.log('[CRM] loadRole query error:', res.error.message);
+  } catch (e) {
+    console.error('[CRM] loadRole failed:', e.message);
+  }
+  console.log('[CRM] loadRole result:', role);
+  isSuperuser = role === 'superuser';
   var importBtn = document.getElementById('importBtn');
   if (importBtn) importBtn.style.display = isSuperuser ? '' : 'none';
   var profileDelBtn = document.getElementById('profileDeleteBtn');

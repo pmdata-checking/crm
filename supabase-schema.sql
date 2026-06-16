@@ -68,6 +68,7 @@ create table if not exists crm_communications (
   id           uuid primary key default gen_random_uuid(),
   customer_id  uuid not null references crm_customers(id) on delete cascade,
   logged_by    uuid references auth.users(id),
+  logged_by_name text,  -- denormalised display name (added in sql/03_add_comms_logged_by_name.sql)
   comm_type    text not null default 'note'
                  check (comm_type in ('call','email','meeting','note','task')),
   direction    text default 'outbound'
