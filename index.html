@@ -985,7 +985,7 @@ function renderTable() {
       + '<td>' + (p ? esc(p.first_name) + ' ' + esc(p.last_name) : '&mdash;') + '</td>'
       + '<td><span class="badge badge-' + c.status + '">' + c.status + '</span></td>'
       + '<td>' + (sub ? esc(sub.plan_name) : '&mdash;') + '</td>'
-      + '<td>' + esc(c.town || '&mdash;') + '</td>'
+      + '<td>' + (c.town ? esc(c.town) : '&mdash;') + '</td>'
       + '<td>' + (comms[0] ? fmtDate(comms[0].occurred_at) : '&mdash;') + '</td>'
       + '</tr>';
   }).join('');
