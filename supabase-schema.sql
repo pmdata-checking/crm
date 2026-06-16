@@ -26,6 +26,13 @@ create table if not exists crm_customers (
                     'quoted','won','lost','on hold')),
   follow_up_on  date,          -- Tracy's "chase on this date"
   next_action   text,          -- short note of the next step
+  company_number text,         -- Companies House number (added in sql/04a_add_company_number.sql)
+  -- AKA + flag-for-deletion (added in sql/05a_add_aka_and_delete_flag.sql)
+  aka                text,                       -- the name WE know them by (may differ from CH registered name)
+  delete_flagged     boolean not null default false,
+  delete_flagged_by  text,                       -- flagger's display name
+  delete_flagged_at  timestamptz,
+  delete_flag_reason text,                       -- why, e.g. "duplicate of #x"
   created_at    timestamptz default now(),
   updated_at    timestamptz default now()
 );
@@ -89,6 +96,8 @@ create index if not exists idx_crm_comms_occurred       on crm_communications(oc
 create index if not exists idx_crm_customers_status     on crm_customers(status);
 create index if not exists idx_crm_customers_follow_up  on crm_customers(follow_up_on);
 create index if not exists idx_crm_customers_pipeline_stage on crm_customers(pipeline_stage);
+create index if not exists idx_crm_customers_aka        on crm_customers(aka);
+create index if not exists idx_crm_customers_delete_flagged on crm_customers(delete_flagged);
 
 -- ============================================================
 -- AUTO-UPDATE updated_at ON CUSTOMERS
