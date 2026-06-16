@@ -139,6 +139,10 @@ tbody td{padding:10px 14px;font-size:13px;}
 .contact-name{font-family:var(--font);font-weight:700;font-size:13px;color:var(--navy);}
 .contact-job{font-size:11px;color:var(--muted);margin-bottom:6px;}
 .contact-detail{font-size:12px;margin-top:2px;}
+.contact-acts{float:right;display:flex;align-items:center;gap:4px;}
+.contact-act{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;line-height:1;padding:2px 4px;}
+.contact-act:hover{color:var(--navy);}
+.contact-del:hover{color:#c0392b;}
 
 .comm-item{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);}
 .comm-item:last-child{border-bottom:none;}
@@ -706,7 +710,7 @@ const FROM_NAME  = 'ProspectManager CRM';
 const { createClient } = supabase;
 const sb = createClient(SB_URL, SB_KEY);
 
-let allCustomers = [], currentId = null, editingSubId = null, _token = null, _refreshToken = null;
+let allCustomers = [], currentId = null, currentCustomer = null, editingSubId = null, _token = null, _refreshToken = null;
 let currentUser = null, isSuperuser = false;
 let appLaunched = false;
 const EDGE_URL = SB_URL + '/functions/v1/manager-users';
@@ -1054,6 +1058,7 @@ async function renderProfile() {
     .select('*, crm_contacts(*), crm_subscriptions(*), crm_communications(*)')
     .eq('id', currentId).single();
   if (error || !c) { showToast('Could not load customer', 'error'); return; }
+  currentCustomer = c;
 
   document.getElementById('profileTitle').innerHTML = esc(c.company_name)
     + (c.aka ? ' <span style="font-weight:400;font-size:12px;color:var(--muted);">&middot; AKA: ' + esc(c.aka) + '</span>' : '');
@@ -1113,7 +1118,11 @@ async function renderProfile() {
   document.getElementById('profileContacts').innerHTML = contacts.length
     ? contacts.map(ct =>
         '<div class="contact-card">'
-        + (ct.is_primary ? '<span class="badge badge-active" style="float:right;">Primary</span>' : '')
+        + '<div class="contact-acts">'
+        +   (ct.is_primary ? '<span class="badge badge-active">Primary</span>' : '')
+        +   '<button class="contact-act" title="Edit contact" onclick="openContactModal(\'' + ct.id + '\')">&#9998;</button>'
+        +   '<button class="contact-act contact-del" title="Delete contact" onclick="deleteContact(\'' + ct.id + '\')">&times;</button>'
+        + '</div>'
         + '<div class="contact-name">' + esc(ct.first_name) + ' ' + esc(ct.last_name) + '</div>'
         + '<div class="contact-job">' + esc(ct.job_title || '') + '</div>'
         + (ct.email ? '<div class="contact-detail">&#9993; <a href="mailto:' + esc(ct.email) + '">' + esc(ct.email) + '</a></div>' : '')
@@ -1159,6 +1168,14 @@ async function deleteComm(id) {
   const { error } = await sb.from('crm_communications').delete().eq('id', id);
   if (error) { showToast('Delete failed: ' + error.message, 'error'); return; }
   showToast('Entry deleted', 'done');
+  await renderProfile();
+}
+
+async function deleteContact(id) {
+  if (!confirm('Delete this contact? This cannot be undone.')) return;
+  const { error } = await sb.from('crm_contacts').delete().eq('id', id);
+  if (error) { showToast('Delete failed: ' + error.message, 'error'); return; }
+  showToast('Contact deleted', 'done');
   await renderProfile();
 }
 
@@ -1268,12 +1285,30 @@ async function saveCustomer() {
 // ════════════════════════════════════════════════════════════
 // MODAL — Contact
 // ════════════════════════════════════════════════════════════
-function openContactModal() {
+function openContactModal(id) {
   ['cfFirst','cfLast','cfTitle','cfEmail','cfPhone','cfMobile','cfNotes'].forEach(f => {
     document.getElementById(f).value = '';
   });
   document.getElementById('cfPrimary').value = 'false';
-  document.getElementById('mContactTitle').textContent = 'ADD CONTACT';
+  const modal = document.getElementById('modalContact');
+  if (id && currentCustomer) {
+    const ct = (currentCustomer.crm_contacts || []).find(x => x.id === id);
+    if (ct) {
+      document.getElementById('cfFirst').value   = ct.first_name || '';
+      document.getElementById('cfLast').value    = ct.last_name || '';
+      document.getElementById('cfTitle').value   = ct.job_title || '';
+      document.getElementById('cfEmail').value   = ct.email || '';
+      document.getElementById('cfPhone').value   = ct.phone || '';
+      document.getElementById('cfMobile').value  = ct.mobile || '';
+      document.getElementById('cfPrimary').value = ct.is_primary ? 'true' : 'false';
+      document.getElementById('cfNotes').value   = ct.notes || '';
+    }
+    document.getElementById('mContactTitle').textContent = 'EDIT CONTACT';
+    modal.dataset.editId = id;
+  } else {
+    document.getElementById('mContactTitle').textContent = 'ADD CONTACT';
+    delete modal.dataset.editId;
+  }
   openModal('modalContact');
 }
 
@@ -1281,19 +1316,38 @@ async function saveContact() {
   const first = document.getElementById('cfFirst').value.trim();
   const last  = document.getElementById('cfLast').value.trim();
   if (!first || !last) { showToast('Name required', 'error'); return; }
-  const { error } = await sb.from('crm_contacts').insert({
-    customer_id: currentId,
+  const isPrimary = document.getElementById('cfPrimary').value === 'true';
+  const payload = {
     first_name:  first,
     last_name:   last,
     job_title:   document.getElementById('cfTitle').value.trim() || null,
     email:       document.getElementById('cfEmail').value.trim() || null,
     phone:       document.getElementById('cfPhone').value.trim() || null,
     mobile:      document.getElementById('cfMobile').value.trim() || null,
-    is_primary:  document.getElementById('cfPrimary').value === 'true',
+    is_primary:  isPrimary,
     notes:       document.getElementById('cfNotes').value.trim() || null,
-  });
+  };
+  const editId = document.getElementById('modalContact').dataset.editId;
+  let error, savedId;
+  if (editId) {
+    ({ error } = await sb.from('crm_contacts').update(payload).eq('id', editId));
+    savedId = editId;
+  } else {
+    let data;
+    ({ data, error } = await sb.from('crm_contacts').insert({ customer_id: currentId, ...payload }).select('id').single());
+    savedId = data && data.id;
+  }
   if (error) { showToast('Save failed: ' + error.message, 'error'); return; }
-  showToast('Contact added', 'done');
+  // Single-primary enforcement: the just-saved contact stays primary; demote all others.
+  if (isPrimary && savedId) {
+    const { error: demoteErr } = await sb.from('crm_contacts')
+      .update({ is_primary: false }).eq('customer_id', currentId).neq('id', savedId);
+    if (demoteErr) {
+      showToast('Contact saved, but demoting other primaries failed: ' + demoteErr.message, 'error');
+      closeModal('modalContact'); await renderProfile(); return;
+    }
+  }
+  showToast(editId ? 'Contact updated' : 'Contact added', 'done');
   closeModal('modalContact');
   await renderProfile();
 }
