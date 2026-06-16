@@ -1012,7 +1012,9 @@ async function deleteSelectedCustomers() {
   const checked = document.querySelectorAll('.cust-cb:checked');
   const ids = [].map.call(checked, function(cb) { return cb.dataset.id; });
   if (!ids.length) return;
-  if (!confirm('Delete ' + ids.length + ' customer' + (ids.length === 1 ? '' : 's') + ' and all their contacts, subscriptions, and activity? This cannot be undone.')) return;
+  const typed = prompt('You’re about to permanently delete ' + ids.length + ' customer record' + (ids.length === 1 ? '' : 's') + ' and all their contacts, subscriptions and activity. This cannot be undone.\n\nType ' + ids.length + ' to confirm.');
+  if (typed === null) return;   // cancelled
+  if (typed.trim() !== String(ids.length)) { showToast('Cancelled — count didn’t match', 'error'); return; }
   const { error } = await sb.from('crm_customers').delete().in('id', ids);
   if (error) { showToast('Delete failed: ' + error.message, 'error'); return; }
   showToast('Deleted ' + ids.length + ' customer' + (ids.length === 1 ? '' : 's'), 'done');
