@@ -19,6 +19,13 @@ create table if not exists crm_customers (
   postcode      text,
   country       text default 'UK',
   notes         text,
+  -- Reactivation pipeline fields (added in sql/02_add_pipeline_fields.sql)
+  pipeline_stage text not null default 'new'
+                  check (pipeline_stage in (
+                    'new','researching','contacted','in conversation',
+                    'quoted','won','lost','on hold')),
+  follow_up_on  date,          -- Tracy's "chase on this date"
+  next_action   text,          -- short note of the next step
   created_at    timestamptz default now(),
   updated_at    timestamptz default now()
 );
@@ -79,6 +86,8 @@ create index if not exists idx_crm_subs_customer        on crm_subscriptions(cus
 create index if not exists idx_crm_comms_customer       on crm_communications(customer_id);
 create index if not exists idx_crm_comms_occurred       on crm_communications(occurred_at desc);
 create index if not exists idx_crm_customers_status     on crm_customers(status);
+create index if not exists idx_crm_customers_follow_up  on crm_customers(follow_up_on);
+create index if not exists idx_crm_customers_pipeline_stage on crm_customers(pipeline_stage);
 
 -- ============================================================
 -- AUTO-UPDATE updated_at ON CUSTOMERS
