@@ -153,6 +153,11 @@ tbody td{padding:10px 14px;font-size:13px;}
 .comm-txt{font-size:12px;color:var(--text);margin-top:3px;white-space:pre-wrap;}
 .comm-del{flex-shrink:0;background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;padding:2px 6px;align-self:flex-start;}
 .comm-del:hover{color:#c0392b;}
+.td-aka{font-size:11px;color:var(--muted);font-weight:400;}
+.row-flagged{background:rgba(192,57,43,.07);}
+.badge-flagged{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(192,57,43,.15);color:#c0392b;border:1px solid rgba(192,57,43,.35);}
+.flag-banner{background:rgba(192,57,43,.10);border:1px solid rgba(192,57,43,.35);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--navy);}
+.flag-banner .fb-actions{margin-top:10px;display:flex;gap:8px;}
 
 /* ── MODALS ── */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(10,20,40,.55);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
@@ -324,6 +329,9 @@ tbody td{padding:10px 14px;font-size:13px;}
             <option value="lost">Lost</option>
             <option value="on hold">On hold</option>
           </select>
+          <label style="display:flex;align-items:center;gap:5px;color:#fff;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;">
+            <input type="checkbox" id="custFlagged" onchange="renderTable()" style="cursor:pointer;"> &#9873; Flagged
+          </label>
           <div class="tb-sep"></div>
           <button class="tb-btn" onclick="openCustomerModal()">+ Add Customer</button>
           <button class="tb-btn" id="bulkDeleteBtn" onclick="deleteSelectedCustomers()" style="display:none;background:rgba(192,57,43,.35);border-color:rgba(255,130,110,.5);">Delete Selected (<span id="bulkDeleteCount">0</span>)</button>
@@ -356,9 +364,11 @@ tbody td{padding:10px 14px;font-size:13px;}
           <button class="tb-btn" onclick="openContactModal()">+ Contact</button>
           <button class="tb-btn" onclick="openCommModal()">+ Activity</button>
           <button class="tb-btn" onclick="openEmailModal()">&#9993; Email</button>
+          <button class="tb-btn" id="flagBtn" onclick="flagForDeletion()" style="display:none;">&#9873; Flag for deletion</button>
           <button class="tb-btn" id="profileDeleteBtn" onclick="deleteCurrentCustomer()" style="display:none;background:rgba(192,57,43,.35);border-color:rgba(255,130,110,.5);margin-left:auto;">Delete</button>
         </div>
         <div class="profile-scroll">
+          <div id="flagBanner"></div>
           <div class="profile-grid">
             <div class="profile-left">
               <div class="card">
@@ -535,6 +545,7 @@ tbody td{padding:10px 14px;font-size:13px;}
         <div class="mfield"><div class="mlabel">Company Name *</div><input class="minput" id="fCo" type="text"></div>
         <div class="mfield"><div class="mlabel">Website</div><input class="minput" id="fWeb" type="url" placeholder="https://"></div>
       </div>
+      <div class="mfield"><div class="mlabel">AKA (the name we know them by)</div><input class="minput" id="fAka" type="text" placeholder="e.g. Comar"></div>
       <div class="mfield"><div class="mlabel">Status *</div>
         <select class="minput" id="fSt">
           <option value="active">Active</option><option value="trial">Trial</option>
@@ -917,13 +928,15 @@ function renderTable() {
   const q   = (document.getElementById('custSearch').value || '').toLowerCase();
   const st  = document.getElementById('custStatus').value;
   const stg = document.getElementById('custStage').value;
+  const flaggedOnly = document.getElementById('custFlagged').checked;
   const today = todayStr();
   const rows = allCustomers.filter(c => {
     const p = (c.crm_contacts||[]).find(x => x.is_primary) || (c.crm_contacts||[])[0];
     const m = (c.company_name||'').toLowerCase().includes(q)
+           || (c.aka||'').toLowerCase().includes(q)
            || (c.town||'').toLowerCase().includes(q)
            || (p ? (p.first_name + ' ' + p.last_name).toLowerCase().includes(q) : false);
-    return m && (!st || c.status === st) && (!stg || c.pipeline_stage === stg);
+    return m && (!st || c.status === st) && (!stg || c.pipeline_stage === stg) && (!flaggedOnly || c.delete_flagged);
   });
   // Default sort: follow_up_on ASC, NULLs last (overdue + due-today float to top).
   // Applied AFTER filtering, so a stage filter still sorts by follow-up within that stage.
@@ -961,9 +974,11 @@ function renderTable() {
     const fu = c.follow_up_on;
     const fuCls = fu ? (fu < today ? 'fu-overdue' : (fu === today ? 'fu-today' : '')) : '';
     const fuTxt = fu ? (fmtDate(fu) + (fu < today ? ' &#9888;' : (fu === today ? ' &bull; today' : ''))) : '&mdash;';
-    return '<tr onclick="openProfile(\'' + c.id + '\')">'
+    return '<tr class="' + (c.delete_flagged ? 'row-flagged' : '') + '" onclick="openProfile(\'' + c.id + '\')">'
       + cbCell
-      + '<td class="td-co">' + esc(c.company_name) + '</td>'
+      + '<td class="td-co">' + esc(c.company_name)
+      +   (c.aka ? '<div class="td-aka">AKA: ' + esc(c.aka) + '</div>' : '')
+      +   (c.delete_flagged ? '<span class="badge-flagged">&#9873; pending deletion</span>' : '') + '</td>'
       + '<td><span class="badge-stage">' + esc(c.pipeline_stage || 'new') + '</span></td>'
       + '<td class="td-next">' + (c.next_action ? esc(c.next_action) : '&mdash;') + '</td>'
       + '<td class="' + fuCls + '">' + fuTxt + '</td>'
@@ -1038,8 +1053,23 @@ async function renderProfile() {
     .eq('id', currentId).single();
   if (error || !c) { showToast('Could not load customer', 'error'); return; }
 
-  document.getElementById('profileTitle').textContent = c.company_name;
+  document.getElementById('profileTitle').innerHTML = esc(c.company_name)
+    + (c.aka ? ' <span style="font-weight:400;font-size:12px;color:var(--muted);">&middot; AKA: ' + esc(c.aka) + '</span>' : '');
   document.getElementById('profileBadge').innerHTML = '<span class="badge badge-' + c.status + '" style="margin-left:6px;">' + c.status + '</span>';
+
+  // Flag-for-deletion banner + flag button (everyone sees the flag; superuser confirms/clears)
+  const fb = document.getElementById('flagBanner');
+  if (c.delete_flagged) {
+    fb.innerHTML = '<div class="flag-banner">&#9873; <strong>Flagged for deletion</strong> by ' + esc(c.delete_flagged_by || 'Unknown')
+      + (c.delete_flagged_at ? ' on ' + fmtDateTime(c.delete_flagged_at) : '')
+      + (c.delete_flag_reason ? '<br>Reason: ' + esc(c.delete_flag_reason) : '')
+      + (isSuperuser
+          ? '<div class="fb-actions"><button class="tb-btn" style="background:var(--navy);border-color:var(--navy);" onclick="clearDeleteFlag()">Clear flag</button>'
+            + '<button class="tb-btn" style="background:rgba(192,57,43,.85);border-color:rgba(192,57,43,.85);" onclick="deleteCurrentCustomer()">Confirm delete</button></div>'
+          : '<div class="fb-actions" style="font-size:11px;color:var(--muted);">A superuser must confirm or clear this flag.</div>')
+      + '</div>';
+  } else { fb.innerHTML = ''; }
+  document.getElementById('flagBtn').style.display = c.delete_flagged ? 'none' : '';
 
   // Reactivation pipeline controls
   document.getElementById('pStage').value  = c.pipeline_stage || 'new';
@@ -1130,6 +1160,31 @@ async function deleteComm(id) {
   await renderProfile();
 }
 
+async function flagForDeletion() {
+  if (!currentId) return;
+  const reason = prompt('Flag this customer for deletion — reason? (e.g. "duplicate of Bailey CW")');
+  if (reason === null) return;   // cancelled
+  const { error } = await sb.from('crm_customers').update({
+    delete_flagged:     true,
+    delete_flagged_by:  getUserDisplayName(),
+    delete_flagged_at:  new Date().toISOString(),
+    delete_flag_reason: reason.trim() || null,
+  }).eq('id', currentId);
+  if (error) { showToast('Flag failed: ' + error.message, 'error'); return; }
+  showToast('Flagged for deletion', 'done');
+  await renderProfile();
+}
+
+async function clearDeleteFlag() {
+  if (!isSuperuser || !currentId) return;
+  const { error } = await sb.from('crm_customers').update({
+    delete_flagged: false, delete_flagged_by: null, delete_flagged_at: null, delete_flag_reason: null,
+  }).eq('id', currentId);
+  if (error) { showToast('Clear failed: ' + error.message, 'error'); return; }
+  showToast('Flag cleared', 'done');
+  await renderProfile();
+}
+
 // ════════════════════════════════════════════════════════════
 // MODALS — Open / Close
 // ════════════════════════════════════════════════════════════
@@ -1152,7 +1207,7 @@ document.querySelectorAll('.modal-overlay').forEach(bg => {
 // MODAL — Customer
 // ════════════════════════════════════════════════════════════
 function openCustomerModal(id) {
-  ['fCo','fWeb','fA1','fA2','fTown','fCounty','fPC','fNotes'].forEach(f => {
+  ['fCo','fWeb','fAka','fA1','fA2','fTown','fCounty','fPC','fNotes'].forEach(f => {
     const el = document.getElementById(f); if (el) el.value = '';
   });
   document.getElementById('fCty').value = 'UK';
@@ -1162,6 +1217,7 @@ function openCustomerModal(id) {
     if (c) {
       document.getElementById('fCo').value     = c.company_name || '';
       document.getElementById('fWeb').value    = c.website || '';
+      document.getElementById('fAka').value    = c.aka || '';
       document.getElementById('fSt').value     = c.status || 'active';
       document.getElementById('fA1').value     = c.address_line1 || '';
       document.getElementById('fA2').value     = c.address_line2 || '';
@@ -1186,6 +1242,7 @@ async function saveCustomer() {
   const payload = {
     company_name:  name,
     website:       document.getElementById('fWeb').value.trim() || null,
+    aka:           document.getElementById('fAka').value.trim() || null,
     status:        document.getElementById('fSt').value,
     address_line1: document.getElementById('fA1').value.trim() || null,
     address_line2: document.getElementById('fA2').value.trim() || null,
