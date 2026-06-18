@@ -549,7 +549,10 @@ tbody td{padding:10px 14px;font-size:13px;}
         <div class="mfield"><div class="mlabel">Company Name *</div><input class="minput" id="fCo" type="text"></div>
         <div class="mfield"><div class="mlabel">Website</div><input class="minput" id="fWeb" type="url" placeholder="https://"></div>
       </div>
-      <div class="mfield"><div class="mlabel">AKA (the name we know them by)</div><input class="minput" id="fAka" type="text" placeholder="e.g. Comar"></div>
+      <div class="frow">
+        <div class="mfield"><div class="mlabel">AKA (the name we know them by)</div><input class="minput" id="fAka" type="text" placeholder="e.g. Comar"></div>
+        <div class="mfield"><div class="mlabel">Phone</div><input class="minput" id="fPhone" type="tel"></div>
+      </div>
       <div class="mfield"><div class="mlabel">Status *</div>
         <select class="minput" id="fSt">
           <option value="active">Active</option><option value="trial">Trial</option>
@@ -568,6 +571,9 @@ tbody td{padding:10px 14px;font-size:13px;}
         <div class="mfield"><div class="mlabel">Postcode</div><input class="minput" id="fPC" type="text"></div>
         <div class="mfield"><div class="mlabel">Country</div><input class="minput" id="fCty" type="text" value="UK"></div>
       </div>
+      <div class="sec-lbl">Selection Context</div>
+      <div class="mfield"><div class="mlabel">Last customer on</div><input class="minput" id="fLastCust" type="date"></div>
+      <div class="mfield"><div class="mlabel">Last selection SQL</div><textarea class="minput" id="fLastSql" style="min-height:60px;resize:vertical;font-family:monospace;font-size:12px;" placeholder="The SQL last used to select this company&hellip;"></textarea></div>
       <div class="sec-lbl">Notes</div>
       <div class="mfield"><textarea class="minput" id="fNotes" style="min-height:68px;resize:vertical;" placeholder="Internal notes&hellip;"></textarea></div>
     </div>
@@ -1043,15 +1049,26 @@ async function openProfile(id) {
   currentId = id;
   document.getElementById('view-list').style.display = 'none';
   document.getElementById('view-profile').style.display = 'flex';
+  // Push a history entry so the browser Back button returns to the list
+  // instead of leaving the app entirely.
+  history.pushState({ crmView: 'profile', id }, '');
   await renderProfile();
 }
 
-function showList() {
+// fromPop=true means we got here via the browser Back button (popstate), so the
+// history entry is already gone — don't unwind it again.
+function showList(fromPop) {
   currentId = null;
   document.getElementById('view-list').style.display = 'flex';
   document.getElementById('view-profile').style.display = 'none';
+  if (!fromPop && history.state && history.state.crmView === 'profile') history.back();
   loadCustomers();
 }
+
+// Browser Back from a profile returns to the list rather than unloading the app.
+window.addEventListener('popstate', () => {
+  if (document.getElementById('view-profile').style.display !== 'none') showList(true);
+});
 
 async function renderProfile() {
   const { data: c, error } = await sb.from('crm_customers')
@@ -1087,7 +1104,10 @@ async function renderProfile() {
   const addr = [c.address_line1, c.address_line2, c.town, c.county, c.postcode, c.country].filter(Boolean);
   document.getElementById('profileCompanyBody').innerHTML = [
     c.website ? '<div class="info-row"><div class="info-lbl">Website</div><div class="info-val"><a href="' + esc(c.website) + '" target="_blank">' + esc(c.website) + '</a></div></div>' : '',
+    c.phone ? '<div class="info-row"><div class="info-lbl">Phone</div><div class="info-val">&#128222; ' + esc(c.phone) + '</div></div>' : '',
     addr.length ? '<div class="info-row"><div class="info-lbl">Address</div><div class="info-val">' + addr.map(esc).join('<br>') + '</div></div>' : '',
+    c.last_customer_on ? '<div class="info-row"><div class="info-lbl">Last customer on</div><div class="info-val">' + fmtDate(c.last_customer_on) + '</div></div>' : '',
+    c.last_selection_sql ? '<div class="info-row"><div class="info-lbl">Last selection SQL</div><div class="info-val"><code style="display:block;white-space:pre-wrap;word-break:break-word;font-size:12px;">' + esc(c.last_selection_sql) + '</code></div></div>' : '',
     c.notes ? '<div class="info-row"><div class="info-lbl">Notes</div><div class="info-val">' + esc(c.notes) + '</div></div>' : '',
   ].join('') || '<div class="empty-state" style="padding:12px;"><p>No details added</p></div>';
 
@@ -1219,14 +1239,19 @@ function openModal(id) {
 }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.modal-overlay').forEach(bg => {
-  bg.addEventListener('click', e => { if (e.target === bg) bg.classList.remove('open'); });
+  // Close on a genuine backdrop click only. Track where the press STARTED:
+  // a text-selection drag that begins inside an input and releases on the
+  // backdrop still fires a click with target===bg — that must NOT close the box.
+  let downOnBg = false;
+  bg.addEventListener('mousedown', e => { downOnBg = (e.target === bg); });
+  bg.addEventListener('click', e => { if (e.target === bg && downOnBg) bg.classList.remove('open'); });
 });
 
 // ════════════════════════════════════════════════════════════
 // MODAL — Customer
 // ════════════════════════════════════════════════════════════
 function openCustomerModal(id) {
-  ['fCo','fWeb','fAka','fA1','fA2','fTown','fCounty','fPC','fNotes'].forEach(f => {
+  ['fCo','fWeb','fAka','fPhone','fA1','fA2','fTown','fCounty','fPC','fNotes','fLastCust','fLastSql'].forEach(f => {
     const el = document.getElementById(f); if (el) el.value = '';
   });
   document.getElementById('fCty').value = 'UK';
@@ -1245,6 +1270,9 @@ function openCustomerModal(id) {
       document.getElementById('fPC').value     = c.postcode || '';
       document.getElementById('fCty').value    = c.country || 'UK';
       document.getElementById('fNotes').value  = c.notes || '';
+      document.getElementById('fPhone').value    = c.phone || '';
+      document.getElementById('fLastCust').value = c.last_customer_on || '';
+      document.getElementById('fLastSql').value  = c.last_selection_sql || '';
     }
     document.getElementById('mCustTitle').textContent = 'EDIT CUSTOMER';
     document.getElementById('modalCustomer').dataset.editId = id;
@@ -1270,6 +1298,9 @@ async function saveCustomer() {
     postcode:      document.getElementById('fPC').value.trim() || null,
     country:       document.getElementById('fCty').value.trim() || 'UK',
     notes:         document.getElementById('fNotes').value.trim() || null,
+    phone:              document.getElementById('fPhone').value.trim() || null,
+    last_customer_on:   document.getElementById('fLastCust').value || null,
+    last_selection_sql: document.getElementById('fLastSql').value.trim() || null,
   };
   const editId = document.getElementById('modalCustomer').dataset.editId;
   let error;

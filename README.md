@@ -15,7 +15,8 @@ Push to `main` → Cloudflare Pages auto-deploys. No build step (single-file SPA
   website, address fields, notes, **pipeline_stage** (new/researching/contacted/
   in conversation/quoted/won/lost/on hold), **follow_up_on** (date), **next_action**,
   **company_number**, **delete_flagged** + **delete_flagged_by** / **delete_flagged_at** /
-  **delete_flag_reason** (flag-for-deletion), created_at/updated_at.
+  **delete_flag_reason** (flag-for-deletion), **phone**, **last_customer_on** (date),
+  **last_selection_sql** (free-text), created_at/updated_at.
 - **crm_contacts** — customer_id → crm_customers (cascade), name/title/email/phone/mobile, is_primary.
 - **crm_subscriptions** — customer_id → crm_customers (cascade), plan, price, billing_cycle, dates, trial/contra/current flags.
 - **crm_communications** — customer_id → crm_customers (cascade), logged_by (auth.users),
@@ -47,6 +48,7 @@ Push to `main` → Cloudflare Pages auto-deploys. No build step (single-file SPA
 5. `sql/04b_import_149_lapsed.sql` — import 149 confirmed lapsed customers
 6. `sql/05a_add_aka_and_delete_flag.sql` — aka + delete-flag columns on crm_customers
 7. `sql/05b_backfill_aka.sql` — backfill aka for existing customers
+8. `sql/06_crm_customer_context_fields.sql` — phone, last_customer_on, last_selection_sql on crm_customers
 
 ## Known limitation
 Superuser delete paths — the profile **Confirm delete** and the **bulk delete** — are

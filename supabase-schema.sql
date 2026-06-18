@@ -33,6 +33,10 @@ create table if not exists crm_customers (
   delete_flagged_by  text,                       -- flagger's display name
   delete_flagged_at  timestamptz,
   delete_flag_reason text,                       -- why, e.g. "duplicate of #x"
+  -- Selection context (added in sql/06_crm_customer_context_fields.sql)
+  phone              text,
+  last_customer_on   date,                        -- when they were last a customer
+  last_selection_sql text,                        -- SQL last used to select this company
   created_at    timestamptz default now(),
   updated_at    timestamptz default now()
 );
