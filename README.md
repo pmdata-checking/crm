@@ -50,6 +50,7 @@ Push to `main` → Cloudflare Pages auto-deploys. No build step (single-file SPA
 7. `sql/05b_backfill_aka.sql` — backfill aka for existing customers
 8. `sql/06_crm_customer_context_fields.sql` — phone, last_customer_on, last_selection_sql on crm_customers
 9. `sql/07_crm_contact_title.sql` — honorific title (Mr/Mrs/Ms/Miss/Dr) on crm_contacts
+10. `sql/08_crm_customer_ref.sql` — permanent customer_ref integer (CU0001 at display) + backfill + DB-owned sequence
 
 ## Known limitation
 Superuser delete paths — the profile **Confirm delete** and the **bulk delete** — are

@@ -33,6 +33,10 @@ create table if not exists crm_customers (
   delete_flagged_by  text,                       -- flagger's display name
   delete_flagged_at  timestamptz,
   delete_flag_reason text,                       -- why, e.g. "duplicate of #x"
+  -- Permanent customer reference (added in sql/08_crm_customer_ref.sql)
+  -- Integer sequence; formatted as CU0001 at display/export time. DB-owned
+  -- counter (default nextval('crm_customer_ref_seq')); never renumbered.
+  customer_ref       integer unique,
   -- Selection context (added in sql/06_crm_customer_context_fields.sql)
   phone              text,
   last_customer_on   date,                        -- when they were last a customer

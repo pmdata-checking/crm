@@ -160,6 +160,7 @@ tbody td{padding:10px 14px;font-size:13px;}
 .comm-del{flex-shrink:0;background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;padding:2px 6px;align-self:flex-start;}
 .comm-del:hover{color:#c0392b;}
 .td-aka{font-size:11px;color:var(--muted);font-weight:400;}
+.td-ref{font-size:10px;color:var(--muted);font-weight:600;letter-spacing:.04em;font-family:var(--body);}
 .row-flagged{background:rgba(192,57,43,.07);}
 .badge-flagged{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(192,57,43,.15);color:#c0392b;border:1px solid rgba(192,57,43,.35);}
 .flag-banner{background:rgba(192,57,43,.10);border:1px solid rgba(192,57,43,.35);border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:13px;color:var(--navy);}
@@ -1007,7 +1008,9 @@ function renderTable() {
     const fuTxt = fu ? (fmtDate(fu) + (fu < today ? ' &#9888;' : (fu === today ? ' &bull; today' : ''))) : '&mdash;';
     return '<tr class="' + (c.delete_flagged ? 'row-flagged' : '') + '" onclick="openProfile(\'' + c.id + '\')">'
       + cbCell
-      + '<td class="td-co">' + esc(c.company_name)
+      + '<td class="td-co">'
+      +   (c.customer_ref != null ? '<div class="td-ref">' + fmtCustRef(c.customer_ref) + '</div>' : '')
+      +   esc(c.company_name)
       +   (c.aka ? '<div class="td-aka">AKA: ' + esc(c.aka) + '</div>' : '')
       +   (c.delete_flagged ? '<span class="badge-flagged">&#9873; pending deletion</span>' : '') + '</td>'
       + '<td><span class="badge-stage">' + esc(c.pipeline_stage || 'new') + '</span></td>'
@@ -1065,6 +1068,7 @@ async function deleteSelectedCustomers() {
 // Column layout: company fields, then 3 contacts split into
 // TITLE/FIRSTN/SURNAME/POSITION/PHONE/EMAIL, then NOTES + COMMS_LOG.
 const EXPORT_HEADERS = [
+  'CUST_REF',
   'COMPANY','AKA','ADD1','ADD2','TOWN','COUNTY','POSTCODE','CO_PHONE',
   'TITLE1','FIRSTN1','SURNAME1','POSITION1','PHONE1','EMAIL1',
   'TITLE2','FIRSTN2','SURNAME2','POSITION2','PHONE2','EMAIL2',
@@ -1120,6 +1124,7 @@ async function exportCustomersXlsx() {
       ]);
 
       aoa.push([
+        fmtCustRef(c.customer_ref),
         c.company_name || '', c.aka || '',
         c.address_line1 || '', c.address_line2 || '', c.town || '',
         c.county || '', c.postcode || '', c.phone || '',
@@ -1133,7 +1138,8 @@ async function exportCustomersXlsx() {
     ws['!cols'] = EXPORT_HEADERS.map(h =>
       (h === 'COMMS_LOG') ? { wch: 60 } :
       (h === 'NOTES') ? { wch: 40 } :
-      (h === 'COMPANY' || h === 'AKA') ? { wch: 26 } : { wch: 16 });
+      (h === 'COMPANY' || h === 'AKA') ? { wch: 26 } :
+      (h === 'CUST_REF') ? { wch: 10 } : { wch: 16 });
 
     // Header row (row 1): bold text on a light-grey fill so black stays readable.
     // Applied to every header cell across all 28 columns.
@@ -1246,7 +1252,9 @@ async function renderProfile() {
   if (error || !c) { showToast('Could not load customer', 'error'); return; }
   currentCustomer = c;
 
-  document.getElementById('profileTitle').innerHTML = esc(c.company_name)
+  document.getElementById('profileTitle').innerHTML =
+      (c.customer_ref != null ? '<span style="font-weight:600;font-size:12px;color:var(--muted);">' + fmtCustRef(c.customer_ref) + '</span> &middot; ' : '')
+    + esc(c.company_name)
     + (c.aka ? ' <span style="font-weight:400;font-size:12px;color:var(--muted);">&middot; AKA: ' + esc(c.aka) + '</span>' : '');
   document.getElementById('profileBadge').innerHTML = '<span class="badge badge-' + c.status + '" style="margin-left:6px;">' + c.status + '</span>';
 
@@ -2116,6 +2124,11 @@ function esc(s) {
 function fmtDate(d) {
   if (!d) return '\u2014';
   return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+// Permanent customer reference: stored as an integer, displayed as CU0001.
+// Blank until sql/08_crm_customer_ref.sql is run (refs are null before then).
+function fmtCustRef(ref) {
+  return (ref === null || ref === undefined || ref === '') ? '' : 'CU' + String(ref).padStart(4, '0');
 }
 function fmtDateTime(d) {
   if (!d) return '\u2014';
