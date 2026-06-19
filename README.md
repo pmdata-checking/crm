@@ -45,7 +45,7 @@ Push to `main` → Cloudflare Pages auto-deploys. No build step (single-file SPA
 2. `sql/02_add_pipeline_fields.sql` — pipeline_stage, follow_up_on, next_action + indexes
 3. `sql/03_add_comms_logged_by_name.sql` — logged_by_name on crm_communications
 4. `sql/04a_add_company_number.sql` — company_number on crm_customers
-5. `sql/04b_import_149_lapsed.sql` — import 149 confirmed lapsed customers
+5. `sql/04b_import_149_lapsed.sql` — import confirmed lapsed customers (file has 149 INSERT rows incl. 3 duplicate CH numbers; live base reconciled to **148** — filename's `149` is historical, kept to avoid churn)
 6. `sql/05a_add_aka_and_delete_flag.sql` — aka + delete-flag columns on crm_customers
 7. `sql/05b_backfill_aka.sql` — backfill aka for existing customers
 8. `sql/06_crm_customer_context_fields.sql` — phone, last_customer_on, last_selection_sql on crm_customers
