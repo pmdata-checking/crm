@@ -45,6 +45,7 @@ create table if not exists crm_customers (
 create table if not exists crm_contacts (
   id           uuid primary key default gen_random_uuid(),
   customer_id  uuid not null references crm_customers(id) on delete cascade,
+  title        text,         -- honorific (Mr/Mrs/Ms/Miss/Dr); added in sql/07_crm_contact_title.sql
   first_name   text not null,
   last_name    text not null,
   job_title    text,
