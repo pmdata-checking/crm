@@ -22,7 +22,12 @@ Push to `main` → Cloudflare Pages auto-deploys. No build step (single-file SPA
 - **crm_communications** — customer_id → crm_customers (cascade), logged_by (auth.users),
   **logged_by_name** (denormalised), comm_type, direction, subject, body, occurred_at.
 - Shared: **user_roles** (read-only, with the Research site).
-- RLS: all `crm_*` tables = authenticated full CRUD (no per-user scoping).
+- RLS: all `crm_*` tables = authenticated full CRUD (no per-user scoping). That is the
+  **effect**. The **mechanism** is not uniform as at 30 July 2026: `crm_communications`
+  uses `TO authenticated`; `crm_customers`, `crm_contacts` and `crm_subscriptions` still
+  use legacy `{public}` policies gated on `auth.role() = 'authenticated'`. Both block the
+  anon key. Standardising on `TO authenticated` is an accepted decision (`DECISIONS.md`);
+  the remaining three tables are outstanding.
 
 ## Features
 - **Working list:** sort by follow-up date (overdue/today flagged), filter by pipeline
@@ -57,6 +62,12 @@ Superuser delete paths — the profile **Confirm delete** and the **bulk delete*
 **UI-gated, not RLS-enforced**: RLS is all-authenticated full CRUD, so the `isSuperuser`
 check is client-side only. Role-aware RLS (a policy keyed on `user_roles.role`) is the
 upgrade path if server-side enforcement is ever needed.
+
+The same gap has a second face: because RLS is all-authenticated with no per-user
+scoping, **any signed-in account can read and write every customer record**, not just
+delete them. The delete note above describes it from the destructive-action side; this
+describes it from the read-and-write-everything side. It is one gap, not two. Anon key
+holders have no access either way. Recorded 30 July 2026.
 
 ## Files
 `index.html` (app) · `crm.html` (legacy view) · `crm-importer.js` + `crm-import-bookmarklet.html` (importer) · `send-email.ts` (Edge Function) · `supabase-schema.sql` (full schema) · `sql/` (migrations + import, run-order above)
